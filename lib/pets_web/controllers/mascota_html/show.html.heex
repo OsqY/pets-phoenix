@@ -1,0 +1,21 @@
+<Layouts.app flash={@flash}>
+  <.header>
+    Mascota {@mascota.id}
+    <:subtitle>This is a mascota record from your database.</:subtitle>
+    <:actions>
+      <.button navigate={~p"/mascotas"}>
+        <.icon name="hero-arrow-left" />
+      </.button>
+      <.button variant="primary" navigate={~p"/mascotas/#{@mascota}/edit?return_to=show"}>
+        <.icon name="hero-pencil-square" /> Edit mascota
+      </.button>
+    </:actions>
+  </.header>
+
+  <.list>
+    <:item title="Nombre">{@mascota.nombre}</:item>
+    <:item title="Descripcion">{@mascota.descripcion}</:item>
+    <:item title="Edad">{@mascota.edad}</:item>
+    <:item title="Peso">{@mascota.peso}</:item>
+  </.list>
+</Layouts.app>

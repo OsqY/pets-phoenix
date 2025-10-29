@@ -1,0 +1,10 @@
+<.form :let={f} for={@changeset} action={@action}>
+  <.input field={f[:nombre]} type="text" label="Nombre" />
+  <.input field={f[:descripcion]} type="textarea" label="Descripcion" />
+  <.input field={f[:edad]} type="number" label="Edad" />
+  <.input field={f[:peso]} type="number" label="Peso" step="any" />
+  <footer>
+    <.button variant="primary">Save Mascota</.button>
+    <.button :if={@return_to} href={@return_to}>Cancel</.button>
+  </footer>
+</.form>

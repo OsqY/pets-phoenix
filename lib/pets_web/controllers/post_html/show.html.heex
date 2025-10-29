@@ -1,0 +1,21 @@
+<Layouts.app flash={@flash}>
+  <.header>
+    Post {@post.id}
+    <:subtitle>This is a post record from your database.</:subtitle>
+    <:actions>
+      <.button navigate={~p"/posts"}>
+        <.icon name="hero-arrow-left" />
+      </.button>
+      <.button variant="primary" navigate={~p"/posts/#{@post}/edit?return_to=show"}>
+        <.icon name="hero-pencil-square" /> Edit post
+      </.button>
+    </:actions>
+  </.header>
+
+  <.list>
+    <:item title="Content">{@post.content}</:item>
+    <:item title="Fecha">{@post.fecha}</:item>
+    <:item title="Mascota">{@post.mascota_id}</:item>
+    <:item title="User">{@post.user_id}</:item>
+  </.list>
+</Layouts.app>
