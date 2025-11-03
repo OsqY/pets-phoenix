@@ -13,17 +13,7 @@ defmodule PetsWeb.Layouts do
 
   @doc """
   Renders your app layout.
-
-  This function is typically invoked from every template,
-  and it often contains your application menu, sidebar,
-  or similar.
-
-  ## Examples
-
-      <Layouts.app flash={@flash}>
-        <h1>Content</h1>
-      </Layouts.app>
-
+  ...
   """
   attr :flash, :map, required: true, doc: "the map of flash messages"
 
@@ -35,49 +25,59 @@ defmodule PetsWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <header class="navbar px-4 sm:px-6 lg:px-8">
-      <div class="flex-1">
-        <a href="/" class="flex-1 flex w-fit items-center gap-2">
-          <img src={~p"/images/logo.svg"} width="36" />
-          <span class="text-sm font-semibold">v{Application.spec(:phoenix, :vsn)}</span>
-        </a>
-      </div>
-      <div class="flex-none">
-        <ul class="flex flex-column px-1 space-x-4 items-center">
-          <li>
-            <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
-          </li>
-          <li>
-            <a href="https://github.com/phoenixframework/phoenix" class="btn btn-ghost">GitHub</a>
-          </li>
-          <li>
-            <.theme_toggle />
-          </li>
-          <li>
-            <a href="https://hexdocs.pm/phoenix/overview.html" class="btn btn-primary">
-              Get Started <span aria-hidden="true">&rarr;</span>
+    <div class="drawer drawer-end">
+      <input id="chat-drawer-toggle" type="checkbox" class="drawer-toggle" />
+
+      <div class="drawer-content flex flex-col min-h-screen">
+        <header class="navbar px-4 sm:px-6 lg:px-8">
+          <div class="flex-1">
+            <a href="/" class="flex-1 flex w-fit items-center gap-2">
+              <img src={~p"/images/logo.svg"} width="36" />
+              <span class="text-sm font-semibold">v{Application.spec(:phoenix, :vsn)}</span>
             </a>
-          </li>
-        </ul>
-      </div>
-    </header>
+          </div>
+          <div class="flex-none">
+            <ul class="flex flex-column px-1 space-x-4 items-center">
+              <%= if has_user_admin?(@current_scope) do %>
+                <li>
+                  <.admin_dropdown />
+                </li>
+              <% end %>
+              <li>
+                <.theme_toggle />
+              </li>
 
-    <main class="px-4 py-20 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl space-y-4">
-        {render_slot(@inner_block)}
-      </div>
-    </main>
+              <li>
+                <label for="chat-drawer-toggle" class="btn btn-ghost btn-circle">
+                  <.icon name="hero-chat-bubble-left-right" class="size-6" />
+                </label>
+              </li>
+            </ul>
+          </div>
+        </header>
 
+        <main class="flex-1 px-4 py-10 sm:px-6 lg:px-8">
+          <div class="mx-auto max-w-4xl space-y-4">
+            {render_slot(@inner_block)}
+          </div>
+        </main>
+      </div>
+
+      <div class="drawer-side z-50">
+        <label for="chat-drawer-toggle" aria-label="close sidebar" class="drawer-overlay"></label>
+
+        <aside class="w-96 min-h-full bg-base-100 p-4">
+          <.chat_sidebar />
+        </aside>
+      </div>
+    </div>
     <.flash_group flash={@flash} />
     """
   end
 
   @doc """
   Shows the flash group with standard titles and content.
-
-  ## Examples
-
-      <.flash_group flash={@flash} />
+  ...
   """
   attr :flash, :map, required: true, doc: "the map of flash messages"
   attr :id, :string, default: "flash-group", doc: "the optional id of flash container"
@@ -117,8 +117,7 @@ defmodule PetsWeb.Layouts do
 
   @doc """
   Provides dark vs light theme toggle based on themes defined in app.css.
-
-  See <head> in root.html.heex which applies the theme before page load.
+  ...
   """
   def theme_toggle(assigns) do
     ~H"""
@@ -151,4 +150,123 @@ defmodule PetsWeb.Layouts do
     </div>
     """
   end
+
+  attr :id, :string, default: "admin-dropdown"
+
+  def admin_dropdown(assigns) do
+    ~H"""
+    <div class="dropdown dropdown-end" id={@id}>
+      <div tabindex="0" role="button" class="btn btn-ghost m-1">
+        <span>Administración</span>
+        <.icon name="hero-chevron-down" class="size-4" />
+      </div>
+
+      <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64">
+        <li><a href={~p"/admin/colores"}><.icon name="hero-shopping-bag" />Colores</a></li>
+        <li><a href={~p"/admin/especies"}><.icon name="hero-users" />Especies</a></li>
+        <li><a href={~p"/admin/razas"}><.icon name="hero-home" />Razas</a></li>
+      </ul>
+    </div>
+    """
+  end
+
+  def chat_sidebar(assigns) do
+    ~H"""
+    <div class="flex flex-col h-full">
+      <h3 class="text-xl font-semibold mb-4 border-b border-base-300 pb-2">
+        Mensajes
+      </h3>
+
+      <div class="mb-4">
+        <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">Contactos</h4>
+        <ul class="menu p-0">
+          <li>
+            <a class="active">
+              <div class="avatar online">
+                <div class="w-8 rounded-full">
+                  <img src="https://ui-avatars.com/api/?name=Ana+Lopez&background=random" />
+                </div>
+              </div>
+              Ana López
+            </a>
+          </li>
+          <li>
+            <a>
+              <div class="avatar offline">
+                <div class="w-8 rounded-full">
+                  <img src="https://ui-avatars.com/api/?name=Juan+Perez&background=random" />
+                </div>
+              </div>
+              Juan Pérez
+            </a>
+          </li>
+          <li>
+            <a>
+              <div class="avatar online">
+                <div class="w-8 rounded-full">
+                  <img src="https://ui-avatars.com/api/?name=Maria+G&background=random" />
+                </div>
+              </div>
+              Maria G.
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="divider m-0"></div>
+
+      <div class="flex-1 overflow-y-auto my-4 p-2 bg-base-200 rounded-box">
+        <div class="chat chat-start">
+          <div class="chat-header text-xs opacity-50">Ana López</div>
+          <div class="chat-bubble">¡Hola! ¿Cómo estás?</div>
+        </div>
+        <div class="chat chat-end">
+          <div class="chat-bubble chat-bubble-primary">¡Hola Ana! Todo bien, ¿y tú?</div>
+        </div>
+        <div class="chat chat-start">
+          <div class="chat-header text-xs opacity-50">Ana López</div>
+          <div class="chat-bubble">¡Genial!</div>
+        </div>
+      </div>
+
+      <form class="flex space-x-2">
+        <input type="text" placeholder="Escribe un mensaje..." class="input input-bordered flex-1" />
+        <button type-="submit" class="btn btn-primary">
+          <.icon name="hero-paper-airplane" class="size-4" />
+        </button>
+      </form>
+    </div>
+    """
+  end
+
+  attr :id, :string, default: "shelter-dropdown"
+
+  def shelter_dropdown(assigns) do
+    ~H"""
+    <div class="dropdown dropdown-end" id={@id}>
+      <div tabindex="0" role="button" class="btn btn-ghost m-1">
+        <span>Administración</span>
+        <.icon name="hero-chevron-down" class="size-4" />
+      </div>
+
+      <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64">
+        <li><a href={~p"/refugio/inventario"}><.icon name="hero-shopping-bag" />Inventario</a></li>
+        <li><a href={~p"/admin/visitas"}><.icon name="hero-users" />Visitas</a></li>
+        <li><a href={~p"/admin/donaciones"}><.icon name="hero-home" />Donaciones</a></li>
+      </ul>
+    </div>
+    """
+  end
+
+  defp has_user_admin?(%{usuario: %{roles: roles}}) when is_list(roles) do
+    "admin"
+  end
+
+  defp has_user_admin?(_), do: false
+
+  def has_user_shelter?(%{usuario: %{roles: roles}}) when is_list(roles) do
+    "shelter"
+  end
+
+  defp has_user_shelter?(), do: false
 end

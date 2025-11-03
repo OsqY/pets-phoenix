@@ -8,8 +8,19 @@ defmodule Pets.Cuentas.Usuario do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime
     field :authenticated_at, :utc_datetime, virtual: true
+    field(:roles, {:array, :string}, default: ["adoptante"])
+
+    has_many :mascotas, Pets.Mascotas.Mascota
+    has_many :comentarios, Pets.Posts.Comentario
+    has_many :posts, Pets.Posts.Post
 
     timestamps(type: :utc_datetime)
+  end
+
+  def changeset_role(user_or_changeset, attrs) do
+    user_or_changeset
+    |> Changeset.cast(attrs, [:roles])
+    |> Changeset.validate_inclusion(:roles, ~w(adoptante refugio admin))
   end
 
   @doc """
@@ -71,7 +82,7 @@ defmodule Pets.Cuentas.Usuario do
       validations on a LiveView form), this option can be set to `false`.
       Defaults to `true`.
   """
-  def password_changeset(usuario, attrs, opts \\ []) do
+  def password_(usuario, attrs, opts \\ []) do
     usuario
     |> cast(attrs, [:password])
     |> validate_confirmation(:password, message: "does not match password")

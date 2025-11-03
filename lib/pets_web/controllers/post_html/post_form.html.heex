@@ -1,9 +1,0 @@
-<.form :let={f} for={@changeset} action={@action}>
-  <.input field={f[:content]} type="textarea" label="Contenido" />
-  <.input field={f[:mascota_id]} type="select" label="Mascota?" options={@mascotas} />
-  <.input field={f[:user_id]} type="number" label="User" />
-  <footer>
-    <.button variant="primary">Save Post</.button>
-    <.button :if={@return_to} href={@return_to}>Cancel</.button>
-  </footer>
-</.form>

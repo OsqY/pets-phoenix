@@ -5,19 +5,35 @@ defmodule Pets.PostsFixtures do
   """
 
   @doc """
+  Generate a comentario.
+  """
+  def comentario_fixture(scope, attrs \\ %{}) do
+    attrs =
+      Enum.into(attrs, %{
+        content: "some content",
+        fecha: ~N[2025-10-29 12:08:00],
+        likes: 42,
+        post_id: 42,
+        usuario_id: 42
+      })
+
+    {:ok, comentario} = Pets.Posts.create_comentario(scope, attrs)
+    comentario
+  end
+
+  @doc """
   Generate a post.
   """
-  def post_fixture(attrs \\ %{}) do
-    {:ok, post} =
-      attrs
-      |> Enum.into(%{
+  def post_fixture(scope, attrs \\ %{}) do
+    attrs =
+      Enum.into(attrs, %{
         content: "some content",
-        fecha: ~D[2025-10-28],
+        fecha: ~D[2025-10-29],
         mascota_id: 42,
-        user_id: 42
+        usuario_id: 42
       })
-      |> Pets.Posts.create_post()
 
+    {:ok, post} = Pets.Posts.create_post(scope, attrs)
     post
   end
 end

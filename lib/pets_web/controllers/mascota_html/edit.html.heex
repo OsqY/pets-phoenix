@@ -1,8 +1,0 @@
-<Layouts.app flash={@flash}>
-  <.header>
-    Edit Mascota {@mascota.id}
-    <:subtitle>Use this form to manage mascota records in your database.</:subtitle>
-  </.header>
-
-  <.mascota_form changeset={@changeset} action={~p"/mascotas/#{@mascota}"} return_to={~p"/mascotas"} />
-</Layouts.app>

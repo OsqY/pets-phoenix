@@ -9,3 +9,13 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+alias Pets.Repo
+alias Pets.Cuentas.Usuario
+
+Repo.insert(%Usuario{
+  email: "admin@gmail.com",
+  password: "passwordAdmin123_",
+  roles: ["admin"],
+  confirmed_at: NaiveDateTime.utc_now()
+})

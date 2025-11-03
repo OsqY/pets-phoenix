@@ -1,9 +1,13 @@
 defmodule PetsWeb.Router do
-  alias PostController
-  alias UserController
+  alias MascotaLive
+  alias MascotaLive
+  alias EspecieLive
+  alias ColorLive
+  alias RazaLive
   use PetsWeb, :router
 
   import PetsWeb.UsuarioAuth
+  import Phoenix.LiveView.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -23,9 +27,6 @@ defmodule PetsWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    get "/mascotas", MascotaController, :index
-    get "/posts", PostController, :index
-
   end
 
   # Other scopes may use custom stacks.
@@ -56,25 +57,50 @@ defmodule PetsWeb.Router do
     pipe_through [:browser, :require_authenticated_usuario]
 
     live_session :require_authenticated_usuario,
-      on_mount: [{PetsWeb.UsuarioAuth, :require_authenticated}] do
+      on_mount: [
+        {
+          PetsWeb.UsuarioAuth,
+          :mount_current_scope
+        },
+        {PetsWeb.UsuarioAuth, :require_authenticated}
+      ] do
       live "/usuario/settings", UsuarioLive.Settings, :edit
       live "/usuario/settings/confirm-email/:token", UsuarioLive.Settings, :confirm_email
+      live "/posts/crear", PostLive.Form, :new
+      live "/posts/:id/editar", PostLive.Form, :edit
+      live "/comentarios/new", ComentarioLive.Form, :new
+      live "/comentarios/:id/edit", ComentarioLive.Form, :edit
+      live "/mascotas/crear", MascotaLive.Form, :new
+      live "/mascotas/:id/editar", MascotaLive.Form, :edit
     end
 
     post "/usuario/update-password", UsuarioSessionController, :update_password
+  end
 
-    get "/mascotas/crear", MascotaController, :new
-    get "/mascotas/:id", MascotaController, :show
-    post "/mascotas", MascotaController, :create
-    get "/mascotas/:id/edit", MascotaController, :edit
-    put "/mascotas/:id", MascotaController, :update
-    delete "/mascotas/:id", MascotaController, :delete
+  scope "/", PetsWeb do
+    pipe_through [:browser, :require_authenticated_usuario]
 
-    get "/posts/crear", PostController, :new
-    post "/posts", PostController, :create
-    get "/posts/:id/edit", PostController, :edit
-    put "/posts/:id", PostController, :update
-    delete "/posts/:id", PostController, :delete
+    live_session :require_admin,
+      on_mount: [
+        {
+          PetsWeb.UsuarioAuth,
+          :mount_current_scope
+        },
+        {PetsWeb.UsuarioAuth, :require_admin}
+      ] do
+      live "/admin/razas", RazaLive.Index, :index
+      live "/admin/razas/crear", RazaLive.Form, :new
+      live "/admin/razas/:id/editar", RazaLive.Form, :edit
+      live "/admin/razas/:id", RazaLive.Show, :show
+      live "/admin/colores", ColorLive.Index, :index
+      live "/admin/colores/crear", ColorLive.Form, :new
+      live "/admin/colores/:id", ColorLive.Show, :show
+      live "/admin/colores/:id/editar", ColorLive.Form, :edit
+      live "/admin/especies", EspecieLive.Index, :index
+      live "/admin/especies/crear", EspecieLive.Form, :new
+      live "/admin/especies/:id", EspecieLive.Show, :show
+      live "/admin/especies/:id/editar", EspecieLive.Form, :edit
+    end
   end
 
   scope "/", PetsWeb do
@@ -85,6 +111,12 @@ defmodule PetsWeb.Router do
       live "/usuario/register", UsuarioLive.Registration, :new
       live "/usuario/log-in", UsuarioLive.Login, :new
       live "/usuario/log-in/:token", UsuarioLive.Confirmation, :new
+      live "/posts", PostLive.Index, :index
+      live "/posts/:id", PostLive.Show, :show
+      live "/mascotas", MascotaLive.Index, :index
+      live "/mascotas/:id", MascotaLive.Show, :show
+      live "/comentarios", ComentarioLive.Index, :index
+      live "/comentarios/:id", ComentarioLive.Show, :show
     end
 
     post "/usuario/log-in", UsuarioSessionController, :create
