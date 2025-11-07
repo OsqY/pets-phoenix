@@ -1,4 +1,5 @@
 defmodule PetsWeb.MascotaLive.Index do
+  alias Pets.Mascotas.Mascota
   use PetsWeb, :live_view
 
   alias Pets.Mascotas
@@ -14,14 +15,13 @@ defmodule PetsWeb.MascotaLive.Index do
             <.button
               variant="primary"
               navigate={~p"/mascotas/crear"}
-              class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 p-4 rounded-lg"
             >
               <.icon name="hero-plus" class="w-5 h-5 mr-1" /> Nueva Mascota
             </.button>
           </:actions>
         </.header>
 
-        <div class="mb-8 p-6 bg-slate-800 rounded-xl border border-slate-700">
+        <div class="mb-8 p-6 rounded-xl border border-slate-700">
           <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div class="flex-1 w-full">
               <label for="search" class="sr-only">Buscar mascotas</label>
@@ -33,19 +33,19 @@ defmodule PetsWeb.MascotaLive.Index do
                   type="text"
                   name="search"
                   id="search"
-                  class="block w-full pl-10 pr-3 py-2 border border-slate-600 rounded-lg bg-slate-700 text-gray-200 placeholder-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  class="block w-full pl-10 pr-3 py-2 border border-slate-600 rounded-lg text-gray-200 placeholder-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                   placeholder="Buscar por nombre, especie..."
                   phx-debounce="300"
                 />
               </div>
             </div>
             <div class="flex gap-3">
-              <select class="block w-full md:w-auto px-3 py-2 border border-slate-600 rounded-lg bg-slate-700 text-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+              <select class="block w-full md:w-auto px-3 py-2 border border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2">
                 <option>Todas las especies</option>
                 <option>Perros</option>
                 <option>Gatos</option>
               </select>
-              <select class="block w-full md:w-auto px-3 py-2 border border-slate-600 rounded-lg bg-slate-700 text-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+              <select class="block w-full md:w-auto px-3 py-2 border border-slate-600 rounded-lg late-700 text-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
                 <option>Cualquier tamaño</option>
                 <option>Pequeño</option>
                 <option>Mediano</option>
@@ -59,10 +59,10 @@ defmodule PetsWeb.MascotaLive.Index do
           <div
             :for={{id, mascota} <- @streams.mascotas}
             id={id}
-            class="group bg-slate-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-slate-700 overflow-hidden hover:scale-105"
+            class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg dark:shadow-2xl border border-zinc-200 dark:border-slate-700 overflow-hidden"
             phx-click={JS.navigate(~p"/mascotas/#{mascota}")}
           >
-            <div class="h-48 bg-gradient-to-br from-slate-700 to-slate-800 rounded-t-2xl flex items-center justify-center relative overflow-hidden">
+            <div class="h-48 rounded-t-2xl flex items-center justify-center relative overflow-hidden">
               <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               </div>
               <.icon
@@ -74,7 +74,7 @@ defmodule PetsWeb.MascotaLive.Index do
                   "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold",
                   mascota.sexo == "Macho" && "bg-blue-500/20 text-blue-300",
                   mascota.sexo == "Hembra" && "bg-pink-500/20 text-pink-300",
-                  "bg-slate-700 text-slate-300"
+                  "late-700 text-slate-300"
                 ]}>
                   <.icon
                     name={(mascota.sexo == "Macho" && "hero-sparkles") || "hero-heart"}
@@ -114,21 +114,30 @@ defmodule PetsWeb.MascotaLive.Index do
               </p>
 
               <div class="grid grid-cols-2 gap-3 text-sm text-gray-300 mb-4">
-                <div class="flex items-center bg-slate-700 rounded-lg p-2">
+                <div class="flex items-center late-700 rounded-lg p-2">
                   <.icon name="hero-cake" class="w-4 h-4 mr-2 text-purple-400" />
                   <span class="font-medium">{mascota.edad} años</span>
                 </div>
-                <div class="flex items-center bg-slate-700 rounded-lg p-2">
+                <div class="flex items-center late-700 rounded-lg p-2">
                   <.icon name="hero-arrows-pointing-out" class="w-4 h-4 mr-2 text-blue-400" />
                   <span class="font-medium">{mascota.tamanio}</span>
                 </div>
-                <div class="flex items-center bg-slate-700 rounded-lg p-2">
+                <div class="flex items-center late-700 rounded-lg p-2">
                   <.icon name="hero-scale" class="w-4 h-4 mr-2 text-green-400" />
                   <span class="font-medium">{mascota.peso} kg</span>
                 </div>
-                <div class="flex items-center bg-slate-700 rounded-lg p-2">
+                <div class="flex items-center late-700 rounded-lg p-2">
                   <.icon name="hero-paint-brush" class="w-4 h-4 mr-2 text-orange-400" />
                   <span class="font-medium">{mascota.color.nombre}</span>
+                </div>
+
+                <div class="flex items-center late-700 rounded-lg p-2">
+                  <.icon name="hero-home" class="w-4 h-4 mr-2 text-cyan-400" />
+                  <span class="font-medium">{Mascota.humanize_estado(mascota.estado)}</span>
+                </div>
+                <div class="flex items-center late-700 rounded-lg p-2">
+                  <.icon name="hero-bolt" class="w-4 h-4 mr-2 text-yellow-400" />
+                  <span class="font-medium">{Mascota.humanize_energia(mascota.energia)}</span>
                 </div>
               </div>
 
@@ -157,7 +166,7 @@ defmodule PetsWeb.MascotaLive.Index do
 
         <div
           :if={map_size(@streams.mascotas) == 0}
-          class="text-center py-16 bg-slate-800 rounded-2xl border-2 border-dashed border-slate-700"
+          class="text-center py-16 late-800 rounded-2xl border-2 border-dashed border-slate-700"
         >
           <.icon name="hero-inbox" class="w-20 h-20 text-slate-600 mx-auto mb-6" />
           <h3 class="text-2xl font-bold text-gray-100 mb-3">¡Aún no hay mascotas!</h3>
@@ -174,7 +183,7 @@ defmodule PetsWeb.MascotaLive.Index do
         </div>
 
         <div class="mt-8 text-center">
-          <div class="inline-flex items-center px-4 py-2 bg-slate-800 rounded-full shadow-sm border border-slate-700">
+          <div class="inline-flex items-center px-4 py-2 late-800 rounded-full shadow-sm border border-slate-700">
             <.icon name="hero-heart" class="w-5 h-5 mr-2 text-pink-500" />
             <span class="text-sm font-medium text-gray-300">
               Mostrando <span class="font-bold text-purple-400">{map_size(@streams.mascotas)}</span>
@@ -215,6 +224,6 @@ defmodule PetsWeb.MascotaLive.Index do
   end
 
   defp list_mascotas(current_scope) do
-    Mascotas.list_mascotas(current_scope)
+    Mascotas.list_mascotas()
   end
 end

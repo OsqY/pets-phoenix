@@ -2,6 +2,19 @@ defmodule Pets.Mascotas.Mascota do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @estado_options [
+    "En Adopción": :EnAdopcion,
+    "Con Hogar": :ConHogar,
+    Adoptado: :Adoptado,
+    "En proceso de Adopción": :EnProcesoAdopcion
+  ]
+
+  @energia_options [
+    Alta: :Alta,
+    Media: :Media,
+    Baja: :Baja
+  ]
+
   schema "mascotas" do
     field :nombre, :string
     field :descripcion, :string
@@ -9,6 +22,13 @@ defmodule Pets.Mascotas.Mascota do
     field :sexo, :string
     field :tamanio, :string
     field :peso, :float
+    field :sociable_mascotas, :boolean
+    field :sociable_personas, :boolean
+    field :necesidades_especiales, :string
+    field :historia, :string
+
+    field :estado, Ecto.Enum, values: Keyword.values(@estado_options)
+    field :energia, Ecto.Enum, values: Keyword.values(@energia_options)
 
     belongs_to :usuario, Pets.Cuentas.Usuario
     belongs_to :color, Pets.Mascotas.Color
@@ -31,9 +51,14 @@ defmodule Pets.Mascotas.Mascota do
       :tamanio,
       :peso,
       :color_id,
-      :usuario_id,
       :especie_id,
-      :raza_id
+      :raza_id,
+      :sociable_mascotas,
+      :sociable_personas,
+      :energia,
+      :historia,
+      :necesidades_especiales,
+      :estado
     ])
     |> validate_required([
       :nombre,
@@ -43,10 +68,28 @@ defmodule Pets.Mascotas.Mascota do
       :tamanio,
       :peso,
       :color_id,
-      :usuario_id,
       :especie_id,
-      :raza_id
+      :raza_id,
+      :sociable_mascotas,
+      :sociable_personas,
+      :energia,
+      :estado
     ])
     |> put_change(:usuario_id, usuario_scope.usuario.id)
+  end
+
+  def estado_options, do: @estado_options
+  def energia_options, do: @energia_options
+
+  def humanize_estado(atom) do
+    Enum.find_value(@estado_options, "N/A", fn {label, val} ->
+      if val == atom, do: label
+    end)
+  end
+
+  def humanize_energia(atom) do
+    Enum.find_value(@energia_options, "N/A", fn {label, val} ->
+      if val == atom, do: label
+    end)
   end
 end

@@ -43,7 +43,7 @@ defmodule PetsWeb.PostLive.Form do
     mascotas = Mascotas.list_mascotas_for_dropdown(socket.assigns.current_scope)
 
     socket
-    |> assign(:page_title, "Edit Post")
+    |> assign(:page_title, "Editar Publicación")
     |> assign(:post, post)
     |> assign(:mascotas, mascotas)
     |> assign(:form, to_form(Posts.change_post(socket.assigns.current_scope, post)))
@@ -54,7 +54,7 @@ defmodule PetsWeb.PostLive.Form do
     mascotas = Mascotas.list_mascotas_for_dropdown(socket.assigns.current_scope)
 
     socket
-    |> assign(:page_title, "New Post")
+    |> assign(:page_title, "Nueva Publicación")
     |> assign(:post, post)
     |> assign(:mascotas, mascotas)
     |> assign(:form, to_form(Posts.change_post(socket.assigns.current_scope, post)))

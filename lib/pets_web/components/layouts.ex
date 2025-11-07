@@ -38,7 +38,15 @@ defmodule PetsWeb.Layouts do
           </div>
           <div class="flex-none">
             <ul class="flex flex-column px-1 space-x-4 items-center">
-              <%= if has_user_admin?(@current_scope) do %>
+              <li>
+                <.social_dropdown />
+              </li>
+              <%= if @current_scope && has_user_shelter?(@current_scope) do %>
+                <li>
+                  <.shelter_dropdown />
+                </li>
+              <% end %>
+              <%= if @current_scope && has_user_admin?(@current_scope) do %>
                 <li>
                   <.admin_dropdown />
                 </li>
@@ -63,13 +71,15 @@ defmodule PetsWeb.Layouts do
         </main>
       </div>
 
-      <div class="drawer-side z-50">
-        <label for="chat-drawer-toggle" aria-label="close sidebar" class="drawer-overlay"></label>
+      <%= if @current_scope do %>
+        <div class="drawer-side z-50">
+          <label for="chat-drawer-toggle" aria-label="close sidebar" class="drawer-overlay"></label>
 
-        <aside class="w-96 min-h-full bg-base-100 p-4">
-          <.chat_sidebar />
-        </aside>
-      </div>
+          <aside class="w-96 min-h-full bg-base-100 p-4">
+            <.chat_sidebar />
+          </aside>
+        </div>
+      <% end %>
     </div>
     <.flash_group flash={@flash} />
     """
@@ -245,28 +255,52 @@ defmodule PetsWeb.Layouts do
     ~H"""
     <div class="dropdown dropdown-end" id={@id}>
       <div tabindex="0" role="button" class="btn btn-ghost m-1">
-        <span>Administración</span>
+        <span>Gestión de Refugio</span>
         <.icon name="hero-chevron-down" class="size-4" />
       </div>
 
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64">
         <li><a href={~p"/refugio/inventario"}><.icon name="hero-shopping-bag" />Inventario</a></li>
-        <li><a href={~p"/admin/visitas"}><.icon name="hero-users" />Visitas</a></li>
-        <li><a href={~p"/admin/donaciones"}><.icon name="hero-home" />Donaciones</a></li>
+        <li>
+          <a href={~p"/refugio/donacion-dinero"}><.icon name="hero-users" />Donaciones Dinero</a>
+        </li>
+        <li>
+          <a href={~p"/refugio/donacion-inventario"}>
+            <.icon name="hero-users" />Donaciones Inventario
+          </a>
+        </li>
+      </ul>
+    </div>
+    """
+  end
+
+  attr :id, :string, default: "social-dropdown"
+
+  def social_dropdown(assigns) do
+    ~H"""
+    <div class="dropdown dropdown-end" id={@id}>
+      <div tabindex="0" role="button" class="btn btn-ghost m-1">
+        <span>Social</span>
+        <.icon name="hero-chevron-down" class="size-4" />
+      </div>
+
+      <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64">
+        <li><a href={~p"/mascotas"}><.icon name="hero-shopping-bag" />Mascotas</a></li>
+        <li><a href={~p"/posts"}><.icon name="hero-users" />Publicaciones</a></li>
       </ul>
     </div>
     """
   end
 
   defp has_user_admin?(%{usuario: %{roles: roles}}) when is_list(roles) do
-    "admin"
+    "admin" in roles
   end
 
   defp has_user_admin?(_), do: false
 
-  def has_user_shelter?(%{usuario: %{roles: roles}}) when is_list(roles) do
-    "shelter"
+  defp has_user_shelter?(%{usuario: %{roles: roles}}) when is_list(roles) do
+    "refugio" in roles
   end
 
-  defp has_user_shelter?(), do: false
+  defp has_user_shelter?(_), do: false
 end

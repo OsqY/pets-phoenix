@@ -4,6 +4,7 @@ defmodule Pets.Mascotas do
   """
 
   import Ecto.Query, warn: false
+  alias Inspect.Pets.Cuentas.Usuario
   alias Pets.Repo
 
   alias Pets.Mascotas.Mascota
@@ -433,15 +434,15 @@ defmodule Pets.Mascotas do
 
   """
   def subscribe_mascotas(%Scope{} = scope) do
-    key = scope.usuario.id
+    Phoenix.PubSub.subscribe(Pets.PubSub, "mascotas")
+  end
 
-    Phoenix.PubSub.subscribe(Pets.PubSub, "usuario:#{key}:mascotas")
+  def subscribe_mascotas(nil) do
+    Phoenix.PubSub.subscribe(Pets.PubSub, "mascotas")
   end
 
   defp broadcast_mascota(%Scope{} = scope, message) do
-    key = scope.usuario.id
-
-    Phoenix.PubSub.broadcast(Pets.PubSub, "usuario:#{key}:mascotas", message)
+    Phoenix.PubSub.subscribe(Pets.PubSub, "mascotas")
   end
 
   @doc """
@@ -453,7 +454,7 @@ defmodule Pets.Mascotas do
       [%Mascota{}, ...]
 
   """
-  def list_mascotas(%Scope{} = scope) do
+  def list_mascotas() do
     especie_query = from r in Especie, select: struct(r, [:nombre])
     color_query = from c in Color, select: struct(c, [:nombre])
     raza_query = from r in Raza, select: struct(r, [:nombre])
@@ -487,8 +488,40 @@ defmodule Pets.Mascotas do
       ** (Ecto.NoResultsError)
 
   """
-  def get_mascota!(%Scope{} = scope, id) do
-    Repo.get_by!(Mascota, id: id, usuario_id: scope.usuario.id)
+  def get_mascota(%Scope{} = scope, id) do
+    Repo.get_by(Mascota, id: id, usuario_id: scope.usuario.id)
+  end
+
+  def get_mascota(id) do
+    Repo.get_by(Mascota, id: id)
+  end
+
+  def get_mascota_for_show!(%Scope{} = scope, id) do
+    query =
+      from m in Mascota,
+        where: m.id == ^id,
+        preload: [
+          :usuario,
+          color: ^from(c in Color, select: %{id: c.id, nombre: c.nombre}),
+          raza: ^from(r in Raza, select: %{id: r.id, nombre: r.nombre}),
+          especie: ^from(e in Especie, select: %{id: e.id, nombre: e.nombre})
+        ]
+
+    Repo.one(query)
+  end
+
+  def get_mascota_for_show!(_, id) do
+    query =
+      from m in Mascota,
+        where: m.id == ^id,
+        preload: [
+          :usuario,
+          color: ^from(c in Color, select: %{id: c.id, nombre: c.nombre}),
+          raza: ^from(r in Raza, select: %{id: r.id, nombre: r.nombre}),
+          especie: ^from(e in Especie, select: %{id: e.id, nombre: e.nombre})
+        ]
+
+    Repo.one(query)
   end
 
   @doc """
@@ -509,6 +542,8 @@ defmodule Pets.Mascotas do
            |> Mascota.changeset(attrs, scope)
            |> Repo.insert() do
       broadcast_mascota(scope, {:created, mascota})
+
+      Phoenix.PubSub.broadcast(Pets.PubSub, "mascotas", {:created, mascota})
       {:ok, mascota}
     end
   end
@@ -533,6 +568,7 @@ defmodule Pets.Mascotas do
            |> Mascota.changeset(attrs, scope)
            |> Repo.update() do
       broadcast_mascota(scope, {:updated, mascota})
+      Phoenix.PubSub.broadcast(Pets.PubSub, "mascotas", {:updated, mascota})
       {:ok, mascota}
     end
   end

@@ -13,6 +13,7 @@ defmodule Pets.Cuentas.Usuario do
     has_many :mascotas, Pets.Mascotas.Mascota
     has_many :comentarios, Pets.Posts.Comentario
     has_many :posts, Pets.Posts.Post
+    has_many :items_inventario, Pets.Refugios.ItemInventario
 
     timestamps(type: :utc_datetime)
   end

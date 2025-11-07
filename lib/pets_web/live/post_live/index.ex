@@ -14,7 +14,6 @@ defmodule PetsWeb.PostLive.Index do
           <.button
             variant="primary"
             navigate={~p"/posts/crear"}
-            class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 p-4 rounded-lg"
           >
             <.icon name="hero-plus" class="w-5 h-5 mr-1" /> Nueva Publicación
           </.button>
@@ -36,9 +35,7 @@ defmodule PetsWeb.PostLive.Index do
               <span class="font-semibold text-zinc-800 dark:text-gray-100">
                 {post.usuario.email}
               </span>
-              <span class="block text-sm text-zinc-500 dark:text-gray-400">
-                <%!-- Para: {post.mascota.nombre} --%>
-              </span>
+              <span class="block text-sm text-zinc-500 dark:text-gray-400"></span>
             </div>
             <span class="text-sm text-zinc-500 dark:text-gray-400">
               {post.fecha}
@@ -98,7 +95,7 @@ defmodule PetsWeb.PostLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Listing Posts")
+     |> assign(:page_title, "Mostrando Publicaciones")
      |> stream(:posts, list_posts())}
   end
 

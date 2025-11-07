@@ -233,12 +233,32 @@ defmodule PetsWeb.UsuarioAuth do
   def on_mount(:require_admin, _params, session, socket) do
     socket = mount_current_scope(socket, session)
 
-    if socket.assigns.current_scope.usuario && "admin" in socket.assigns.current_scope.usuario.roles do
+    if socket.assigns.current_scope.usuario &&
+         "admin" in socket.assigns.current_scope.usuario.roles do
       {:cont, socket}
     else
       socket =
         socket
-        |> Phoenix.LiveView.put_flash(:error, "You must be an admin to access this page.")
+        |> Phoenix.LiveView.put_flash(
+          :error,
+          "Debe ser administrador para acceder a esta página."
+        )
+        |> Phoenix.LiveView.redirect(to: ~p"/")
+
+      {:halt, socket}
+    end
+  end
+
+  def on_mount(:require_refugio, _params, session, socket) do
+    socket = mount_current_scope(socket, session)
+
+    if socket.assigns.current_scope.usuario &&
+         "refugio" in socket.assigns.current_scope.usuario.roles do
+      {:cont, socket}
+    else
+      socket =
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "Debe tener un refugio para acceder a esta página.")
         |> Phoenix.LiveView.redirect(to: ~p"/")
 
       {:halt, socket}

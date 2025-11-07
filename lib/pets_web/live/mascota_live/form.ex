@@ -1,4 +1,5 @@
 defmodule PetsWeb.MascotaLive.Form do
+  alias Phoenix.Router.Route
   use PetsWeb, :live_view
 
   alias Pets.Mascotas
@@ -10,7 +11,7 @@ defmodule PetsWeb.MascotaLive.Form do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {@page_title}
-        <:subtitle>Use this form to manage mascota records in your database.</:subtitle>
+        <:subtitle>Formulario de Registro de Mascotas</:subtitle>
       </.header>
 
       <.form for={@form} id="mascota-form" phx-change="validate" phx-submit="save">
@@ -23,8 +24,9 @@ defmodule PetsWeb.MascotaLive.Form do
         <.input field={@form[:color_id]} type="select" options={@colores} label="Color" />
         <.input
           field={@form[:energia]}
-          type="text"
+          type="select"
           label="Nivel de energía"
+          options={@energia_options}
         />
         <.input
           field={@form[:sociable_mascotas]}
@@ -48,14 +50,14 @@ defmodule PetsWeb.MascotaLive.Form do
         />
         <.input
           field={@form[:estado]}
-          type="text"
+          type="select"
           label="Estado"
+          options={@estados_options}
         />
         <.input field={@form[:especie_id]} type="select" options={@especies} label="Especie" />
         <.input field={@form[:raza_id]} type="select" options={@razas} label="Raza" />
-        <.input field={@form[:usuario_id]} type="number" label="Usuario" />
         <footer>
-          <.button phx-disable-with="Agregando..." variant="primary">Agregar Mascota</.button>
+          <.button phx-disable-with="Agregando..." variant="primary">Registrar Mascota</.button>
           <.button navigate={return_path(@current_scope, @return_to, @mascota)}>Cancelar</.button>
         </footer>
       </.form>
@@ -68,6 +70,8 @@ defmodule PetsWeb.MascotaLive.Form do
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
+     |> assign(estados_options: Mascota.estados_options())
+     |> assign(energia_options: Mascota.energia_options())
      |> apply_action(socket.assigns.live_action, params)}
   end
 
@@ -75,12 +79,41 @@ defmodule PetsWeb.MascotaLive.Form do
   defp return_to(_), do: "index"
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    mascota = Mascotas.get_mascota!(socket.assigns.current_scope, id)
+    case mascota = Mascotas.get_mascota(socket.assigns.current_scope, id) do
+      mascota when not is_nil(mascota) ->
+        colores =
+          Mascotas.list_colores(socket.assigns.current_scope)
+          |> Enum.map(fn color -> {color.nombre, color.id} end)
 
-    socket
-    |> assign(:page_title, "Editar Mascota")
-    |> assign(:mascota, mascota)
-    |> assign(:form, to_form(Mascotas.change_mascota(socket.assigns.current_scope, mascota)))
+        especies =
+          Mascotas.list_especies(socket.assigns.current_scope)
+          |> Enum.map(fn especie -> {especie.nombre, especie.id} end)
+
+        razas =
+          Mascotas.list_razas(socket.assigns.current_scope)
+          |> Enum.map(fn raza -> {raza.nombre, raza.id} end)
+
+        socket
+        |> assign(:page_title, "Editar Mascota")
+        |> assign(:mascota, mascota)
+        |> assign(:colores, colores)
+        |> assign(:razas, razas)
+        |> assign(:especies, especies)
+        |> assign(:form, to_form(Mascotas.change_mascota(socket.assigns.current_scope, mascota)))
+
+      nil ->
+        mascota = Mascotas.get_mascota(id)
+
+        if mascota == nil do
+          socket
+          |> put_flash(:error, "Mascota no encontrada.")
+          |> redirect(to: "/mascotas")
+        else
+          socket
+          |> put_flash(:error, "No tiene permisos para editar la mascota.")
+          |> redirect(to: "/mascotas/#{id}")
+        end
+    end
   end
 
   defp apply_action(socket, :new, _params) do

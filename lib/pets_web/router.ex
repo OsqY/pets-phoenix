@@ -68,10 +68,18 @@ defmodule PetsWeb.Router do
       live "/usuario/settings/confirm-email/:token", UsuarioLive.Settings, :confirm_email
       live "/posts/crear", PostLive.Form, :new
       live "/posts/:id/editar", PostLive.Form, :edit
-      live "/comentarios/new", ComentarioLive.Form, :new
-      live "/comentarios/:id/edit", ComentarioLive.Form, :edit
+      live "/comentarios/crear", ComentarioLive.Form, :new
+      live "/comentarios/:id/editar", ComentarioLive.Form, :edit
       live "/mascotas/crear", MascotaLive.Form, :new
       live "/mascotas/:id/editar", MascotaLive.Form, :edit
+      live "/solicitudes", SolicitudAdopcionLive.Index, :index
+      live "/solicitudes/crear", SolicitudAdopcionLive.Form, :new
+      live "/solicitudes/:id/editar", SolicitudAdopcionLive.Form, :edit
+      live "/solicitudes/:id", SolicitudAdopcionLive.Show, :show
+      live "/solicitudes/:id/seguimientos", SeguimientoLive.Index, :index
+      live "/solicitudes/:id/seguimientos/crear", SeguimientoLive.Form, :new
+      live "/solicitudes/:id/seguimientos/:id/editar", SeguimientoLive.Form, :edit
+      live "/solicitudes/:id/seguimientos/:id", SeguimientoLive.Index, :show
     end
 
     post "/usuario/update-password", UsuarioSessionController, :update_password
@@ -101,6 +109,25 @@ defmodule PetsWeb.Router do
       live "/admin/especies/:id", EspecieLive.Show, :show
       live "/admin/especies/:id/editar", EspecieLive.Form, :edit
     end
+
+    live_session :require_refugio,
+      on_mount: [
+        {PetsWeb.UsuarioAuth, :mount_current_scope},
+        {PetsWeb.UsuarioAuth, :require_refugio}
+      ] do
+      live "/refugio/inventario", ItemInventarioLive.Index, :index
+      live "/refugio/inventario/crear-item", ItemInventarioLive.Form, :new
+      live "/refugio/inventario/:id/editar-item", ItemInventarioLive.Form, :edit
+      live "/refugio/inventario/:id", ItemInventarioLive.Show, :show
+      live "/refugio/donacion-dinero", DonacionDineroLive.Index, :index
+      live "/refugio/donacion-dinero/crear", DonacionDineroLive.Form, :new
+      live "/refugio/donacion-dinero/:id/editar", DonacionDineroLive.Form, :edit
+      live "/refugio/donacion-dinero/:id", DonacionDineroLive.Show, :show
+      live "/refugio/donacion-inventario", DonacionInventarioLive.Index, :index
+      live "/refugio/donacion-inventario/crear", DonacionInventarioLive.Form, :new
+      live "/refugio/donacion-inventario/:id/editar", DonacionInventarioLive.Form, :edit
+      live "/refugio/donacion-inventario/:id", DonacionInventarioLive.Show, :show
+    end
   end
 
   scope "/", PetsWeb do
@@ -113,8 +140,8 @@ defmodule PetsWeb.Router do
       live "/usuario/log-in/:token", UsuarioLive.Confirmation, :new
       live "/posts", PostLive.Index, :index
       live "/posts/:id", PostLive.Show, :show
-      live "/mascotas", MascotaLive.Index, :index
-      live "/mascotas/:id", MascotaLive.Show, :show
+      live "/mascotas", MascotaLive.Index, :index, as: :mascota_index
+      live "/mascotas/:id", MascotaLive.Show, :show, as: :show_mascota
       live "/comentarios", ComentarioLive.Index, :index
       live "/comentarios/:id", ComentarioLive.Show, :show
     end
