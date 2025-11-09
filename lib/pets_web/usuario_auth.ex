@@ -223,7 +223,7 @@ defmodule PetsWeb.UsuarioAuth do
     else
       socket =
         socket
-        |> Phoenix.LiveView.put_flash(:error, "You must log in to access this page.")
+        |> Phoenix.LiveView.put_flash(:error, "Debe iniciar sesión para acceder a esta página.")
         |> Phoenix.LiveView.redirect(to: ~p"/usuario/log-in")
 
       {:halt, socket}
@@ -273,7 +273,7 @@ defmodule PetsWeb.UsuarioAuth do
     else
       socket =
         socket
-        |> Phoenix.LiveView.put_flash(:error, "You must re-authenticate to access this page.")
+        |> Phoenix.LiveView.put_flash(:error, "Debe reautentircarse para acceder a esta página.")
         |> Phoenix.LiveView.redirect(to: ~p"/usuario/log-in")
 
       {:halt, socket}
@@ -307,7 +307,7 @@ defmodule PetsWeb.UsuarioAuth do
       conn
     else
       conn
-      |> put_flash(:error, "You must log in to access this page.")
+      |> put_flash(:error, "Debe iniciar sesión para acceder a esta página.")
       |> maybe_store_return_to()
       |> redirect(to: ~p"/usuario/log-in")
       |> halt()

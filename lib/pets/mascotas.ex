@@ -186,6 +186,10 @@ defmodule Pets.Mascotas do
     Repo.all(Especie)
   end
 
+  def list_especies(_) do
+    Repo.all(Especie)
+  end
+
   @doc """
   Gets a single especie.
 
@@ -454,6 +458,28 @@ defmodule Pets.Mascotas do
       [%Mascota{}, ...]
 
   """
+  def list_mascotas(%Scope{} = scope, search_params \\ "") do
+    especie_query = from r in Especie, select: struct(r, [:nombre])
+    color_query = from c in Color, select: struct(c, [:nombre])
+    raza_query = from r in Raza, select: struct(r, [:nombre])
+
+    base_query =
+      from m in Mascota,
+        preload: [:usuario, color: ^color_query, raza: ^raza_query, especie: ^especie_query]
+
+    query =
+      if search_params != "" do
+        search_term = "%#{search_params}%"
+
+        from [m] in base_query,
+          where: ilike(m.nombre, ^search_term) or ilike(m.tamanio, ^search_term)
+      else
+        base_query
+      end
+
+    Repo.all(query)
+  end
+
   def list_mascotas() do
     especie_query = from r in Especie, select: struct(r, [:nombre])
     color_query = from c in Color, select: struct(c, [:nombre])

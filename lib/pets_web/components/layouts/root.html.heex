@@ -25,7 +25,7 @@
           setTheme(localStorage.getItem("phx:theme") || "system");
         }
         window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
-        
+
         window.addEventListener("phx:set-theme", (e) => setTheme(e.target.dataset.phxTheme));
       })();
     </script>
@@ -37,17 +37,17 @@
           {@current_scope.usuario.email}
         </li>
         <li>
-          <.link href={~p"/usuario/settings"}>Settings</.link>
+          <.link href={~p"/usuario/settings"}>Configuración</.link>
         </li>
         <li>
-          <.link href={~p"/usuario/log-out"} method="delete">Log out</.link>
+          <.link href={~p"/usuario/log-out"} method="delete">Salir</.link>
         </li>
       <% else %>
         <li>
-          <.link href={~p"/usuario/register"}>Register</.link>
+          <.link href={~p"/usuario/register"}>Registrarse</.link>
         </li>
         <li>
-          <.link href={~p"/usuario/log-in"}>Log in</.link>
+          <.link href={~p"/usuario/log-in"}>Iniciar Sesión</.link>
         </li>
       <% end %>
     </ul>

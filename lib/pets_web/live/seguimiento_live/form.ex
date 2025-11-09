@@ -10,17 +10,15 @@ defmodule PetsWeb.SeguimientoLive.Form do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {@page_title}
-        <:subtitle>Use this form to manage seguimiento records in your database.</:subtitle>
+        <:subtitle>Formulario de Seguimiento para procesos de Adopción</:subtitle>
       </.header>
 
       <.form for={@form} id="seguimiento-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:fecha]} type="date" label="Fecha" />
         <.input field={@form[:notas]} type="textarea" label="Notas" />
-        <.input field={@form[:solicitud_id]} type="number" label="Solicitud" />
-        <.input field={@form[:responsable_id]} type="number" label="Responsable" />
         <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Seguimiento</.button>
-          <.button navigate={return_path(@current_scope, @return_to, @seguimiento)}>Cancel</.button>
+          <.button phx-disable-with="Guardando..." variant="primary">Guardar Seguimiento</.button>
+          <.button navigate={return_path(@current_scope, @return_to, @seguimiento)}>Cancelar</.button>
         </footer>
       </.form>
     </Layouts.app>
@@ -42,23 +40,42 @@ defmodule PetsWeb.SeguimientoLive.Form do
     seguimiento = Adopciones.get_seguimiento!(socket.assigns.current_scope, id)
 
     socket
-    |> assign(:page_title, "Edit Seguimiento")
+    |> assign(:page_title, "Editar Seguimiento")
     |> assign(:seguimiento, seguimiento)
-    |> assign(:form, to_form(Adopciones.change_seguimiento(socket.assigns.current_scope, seguimiento)))
+    |> assign(
+      :form,
+      to_form(Adopciones.change_seguimiento(socket.assigns.current_scope, seguimiento))
+    )
   end
 
   defp apply_action(socket, :new, _params) do
-    seguimiento = %Seguimiento{usuario_id: socket.assigns.current_scope.usuario.id}
+    seguimiento = %Seguimiento{
+      solicitud_id: _params["solicitud-id"],
+      responsable_id: socket.assigns.current_scope.usuario.id,
+      usuario_id: _params["adoptante_id"],
+      fecha: NaiveDateTime.utc_now()
+    }
 
     socket
-    |> assign(:page_title, "New Seguimiento")
+    |> assign(:page_title, "Registrar Seguimiento")
     |> assign(:seguimiento, seguimiento)
-    |> assign(:form, to_form(Adopciones.change_seguimiento(socket.assigns.current_scope, seguimiento)))
+    |> assign(
+      :form,
+      to_form(Adopciones.change_seguimiento(socket.assigns.current_scope, seguimiento))
+    )
   end
 
   @impl true
   def handle_event("validate", %{"seguimiento" => seguimiento_params}, socket) do
-    changeset = Adopciones.change_seguimiento(socket.assigns.current_scope, socket.assigns.seguimiento, seguimiento_params)
+    changeset =
+      Adopciones.change_seguimiento(
+        socket.assigns.current_scope,
+        socket.assigns.seguimiento,
+        seguimiento_params
+      )
+
+    IO.inspect(changeset, label: "Changeset")
+
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
@@ -67,11 +84,15 @@ defmodule PetsWeb.SeguimientoLive.Form do
   end
 
   defp save_seguimiento(socket, :edit, seguimiento_params) do
-    case Adopciones.update_seguimiento(socket.assigns.current_scope, socket.assigns.seguimiento, seguimiento_params) do
+    case Adopciones.update_seguimiento(
+           socket.assigns.current_scope,
+           socket.assigns.seguimiento,
+           seguimiento_params
+         ) do
       {:ok, seguimiento} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Seguimiento updated successfully")
+         |> put_flash(:info, "Seguimiento actualizado con éxito.")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, seguimiento)
          )}
@@ -86,7 +107,7 @@ defmodule PetsWeb.SeguimientoLive.Form do
       {:ok, seguimiento} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Seguimiento created successfully")
+         |> put_flash(:info, "Seguimiento creado con éxito.")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, seguimiento)
          )}
@@ -96,6 +117,11 @@ defmodule PetsWeb.SeguimientoLive.Form do
     end
   end
 
-  defp return_path(_scope, "index", _seguimiento), do: ~p"/seguimientos"
-  defp return_path(_scope, "show", seguimiento), do: ~p"/seguimientos/#{seguimiento}"
+  defp return_path(_scope, "index", _seguimiento) do
+    IO.inspect(_seguimiento, label: "Seguimiento")
+    ~p"/solicitudes-adopcion/#{_seguimiento.solicitud_id}/seguimientos"
+  end
+
+  defp return_path(_scope, "show", seguimiento),
+    do: ~p"/solicitudes-adopcion/#{seguimiento.solicitud_id}/seguimientos/#{seguimiento}"
 end

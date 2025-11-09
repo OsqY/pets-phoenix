@@ -10,16 +10,16 @@ defmodule PetsWeb.UsuarioLive.Login do
       <div class="mx-auto max-w-sm space-y-4">
         <div class="text-center">
           <.header>
-            <p>Log in</p>
+            <p>Iniciar Sesión</p>
             <:subtitle>
               <%= if @current_scope do %>
-                You need to reauthenticate to perform sensitive actions on your account.
+                Tienes que reautenticarte para hacer acciones sensibles en tu cuenta.
               <% else %>
-                Don't have an account? <.link
+                ¿No tienes una cuenta? <.link
                   navigate={~p"/usuario/register"}
                   class="font-semibold text-brand hover:underline"
                   phx-no-format
-                >Sign up</.link> for an account now.
+                >Cree una cuenta</.link> ahora.
               <% end %>
             </:subtitle>
           </.header>
@@ -46,13 +46,13 @@ defmodule PetsWeb.UsuarioLive.Login do
             readonly={!!@current_scope}
             field={f[:email]}
             type="email"
-            label="Email"
+            label="Correo electrónico"
             autocomplete="username"
             required
             phx-mounted={JS.focus()}
           />
           <.button class="btn btn-primary w-full">
-            Log in with email <span aria-hidden="true">→</span>
+            Iniciar Sesión solo con correo electrónico<span aria-hidden="true">→</span>
           </.button>
         </.form>
 
@@ -70,21 +70,21 @@ defmodule PetsWeb.UsuarioLive.Login do
             readonly={!!@current_scope}
             field={f[:email]}
             type="email"
-            label="Email"
+            label="Correo electrónico"
             autocomplete="username"
             required
           />
           <.input
             field={@form[:password]}
             type="password"
-            label="Password"
+            label="Contraseña"
             autocomplete="current-password"
           />
           <.button class="btn btn-primary w-full" name={@form[:remember_me].name} value="true">
-            Log in and stay logged in <span aria-hidden="true">→</span>
+            Iniciar Sesión<span aria-hidden="true">→</span>
           </.button>
           <.button class="btn btn-primary btn-soft w-full mt-2">
-            Log in only this time
+            Iniciar Sesión solo esta vez
           </.button>
         </.form>
       </div>
@@ -117,7 +117,7 @@ defmodule PetsWeb.UsuarioLive.Login do
     end
 
     info =
-      "If your email is in our system, you will receive instructions for logging in shortly."
+      "Si tu correo electrónico está en nuestro sistema, recibirás un correo con instrucciones para iniciar sesión."
 
     {:noreply,
      socket

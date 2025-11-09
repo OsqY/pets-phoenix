@@ -4,6 +4,8 @@ defmodule Pets.Adopciones do
   """
 
   import Ecto.Query, warn: false
+  alias Pets.Cuentas.Usuario
+  alias Pets.Mascotas.Mascota
   alias Pets.Repo
 
   alias Pets.Adopciones.SolicitudAdopcion
@@ -40,8 +42,25 @@ defmodule Pets.Adopciones do
       [%SolicitudAdopcion{}, ...]
 
   """
-  def list_solicitudes_adopcion(%Scope{} = scope) do
-    Repo.all_by(SolicitudAdopcion, usuario_id: scope.usuario.id)
+  def list_solicitudes_adopcion_adoptante(%Scope{} = scope) do
+    mascota_query = from m in Mascota, select: [:id, :nombre]
+
+    Repo.all(
+      from s in SolicitudAdopcion,
+        where: s.adoptante_id == ^scope.usuario.id,
+        preload: [mascota: ^mascota_query]
+    )
+  end
+
+  def list_solicitudes_adopcion_refugio(%Scope{} = scope) do
+    mascota_query = from m in Mascota, select: [:id, :nombre]
+    adoptante_query = from u in Usuario, select: [:id, :email]
+
+    Repo.all(
+      from s in SolicitudAdopcion,
+        where: s.refugio_id == ^scope.usuario.id,
+        preload: [adoptante: ^adoptante_query, mascota: ^mascota_query]
+    )
   end
 
   @doc """
@@ -59,7 +78,20 @@ defmodule Pets.Adopciones do
 
   """
   def get_solicitud_adopcion!(%Scope{} = scope, id) do
-    Repo.get_by!(SolicitudAdopcion, id: id, usuario_id: scope.usuario.id)
+    Repo.one(
+      from s in SolicitudAdopcion,
+        where:
+          s.id == ^id and
+            (s.refugio_id == ^scope.usuario.id or s.adoptante_id == ^scope.usuario.id),
+        preload: [:mascota, :adoptante, :refugio]
+    )
+  end
+
+  def get_solicitud_by_scope(%Scope{} = scope, mascota_id) do
+    Repo.one(
+      from s in SolicitudAdopcion,
+        where: s.adoptante_id == ^scope.usuario.id and s.mascota_id == ^mascota_id
+    )
   end
 
   @doc """
@@ -75,6 +107,8 @@ defmodule Pets.Adopciones do
 
   """
   def create_solicitud_adopcion(%Scope{} = scope, attrs) do
+    true = attrs["refugio_id"] != scope.usuario.id
+
     with {:ok, solicitud_adopcion = %SolicitudAdopcion{}} <-
            %SolicitudAdopcion{}
            |> SolicitudAdopcion.changeset(attrs, scope)
@@ -96,8 +130,12 @@ defmodule Pets.Adopciones do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_solicitud_adopcion(%Scope{} = scope, %SolicitudAdopcion{} = solicitud_adopcion, attrs) do
-    true = solicitud_adopcion.usuario_id == scope.usuario.id
+  def update_solicitud_adopcion(
+        %Scope{} = scope,
+        %SolicitudAdopcion{} = solicitud_adopcion,
+        attrs
+      ) do
+    true = solicitud_adopcion.adoptante_id == scope.usuario.id
 
     with {:ok, solicitud_adopcion = %SolicitudAdopcion{}} <-
            solicitud_adopcion
@@ -121,7 +159,7 @@ defmodule Pets.Adopciones do
 
   """
   def delete_solicitud_adopcion(%Scope{} = scope, %SolicitudAdopcion{} = solicitud_adopcion) do
-    true = solicitud_adopcion.usuario_id == scope.usuario.id
+    true = solicitud_adopcion.adoptante_id == scope.usuario.id
 
     with {:ok, solicitud_adopcion = %SolicitudAdopcion{}} <-
            Repo.delete(solicitud_adopcion) do
@@ -139,8 +177,12 @@ defmodule Pets.Adopciones do
       %Ecto.Changeset{data: %SolicitudAdopcion{}}
 
   """
-  def change_solicitud_adopcion(%Scope{} = scope, %SolicitudAdopcion{} = solicitud_adopcion, attrs \\ %{}) do
-    true = solicitud_adopcion.usuario_id == scope.usuario.id
+  def change_solicitud_adopcion(
+        %Scope{} = scope,
+        %SolicitudAdopcion{} = solicitud_adopcion,
+        attrs \\ %{}
+      ) do
+    true = solicitud_adopcion.adoptante_id == scope.usuario.id
 
     SolicitudAdopcion.changeset(solicitud_adopcion, attrs, scope)
   end
@@ -279,7 +321,7 @@ defmodule Pets.Adopciones do
 
   """
   def change_seguimiento(%Scope{} = scope, %Seguimiento{} = seguimiento, attrs \\ %{}) do
-    true = seguimiento.usuario_id == scope.usuario.id
+    true = seguimiento.responsable_id == scope.usuario.id
 
     Seguimiento.changeset(seguimiento, attrs, scope)
   end

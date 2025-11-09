@@ -11,13 +11,13 @@ defmodule PetsWeb.UsuarioLive.Registration do
       <div class="mx-auto max-w-sm">
         <div class="text-center">
           <.header>
-            Register for an account
+            Regístrese para crear una cuenta
             <:subtitle>
-              Already registered?
+              ¿Ya tienes una cuenta?
               <.link navigate={~p"/usuario/log-in"} class="font-semibold text-brand hover:underline">
-                Log in
+                Inicie Sesión
               </.link>
-              to your account now.
+              en su cuenta ahora
             </:subtitle>
           </.header>
         </div>
@@ -26,14 +26,14 @@ defmodule PetsWeb.UsuarioLive.Registration do
           <.input
             field={@form[:email]}
             type="email"
-            label="Email"
+            label="Correo electrónico"
             autocomplete="username"
             required
             phx-mounted={JS.focus()}
           />
 
-          <.button phx-disable-with="Creating account..." class="btn btn-primary w-full">
-            Create an account
+          <.button phx-disable-with="Creando cuenta..." class="btn btn-primary w-full">
+            Cree una cuenta
           </.button>
         </.form>
       </div>
@@ -67,7 +67,7 @@ defmodule PetsWeb.UsuarioLive.Registration do
          socket
          |> put_flash(
            :info,
-           "An email was sent to #{usuario.email}, please access it to confirm your account."
+           "Un correo fue enviado a #{usuario.email}, por favor acceda a él para confirmar su cuenta."
          )
          |> push_navigate(to: ~p"/usuario/log-in")}
 

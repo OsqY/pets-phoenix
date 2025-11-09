@@ -1,4 +1,5 @@
 defmodule PetsWeb.SolicitudAdopcionLive.Form do
+  alias Pets.Mascotas
   alias Pets.Mascotas.Mascota
   use PetsWeb, :live_view
 
@@ -15,9 +16,14 @@ defmodule PetsWeb.SolicitudAdopcionLive.Form do
       </.header>
 
       <.form for={@form} id="solicitud_adopcion-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:fecha_solicitud]} type="date" label="Fecha solicitud" />
-        <.input field={@form[:fecha_revision]} type="date" label="Fecha revision" />
-        <.input field={@form[:adoptante_id]} type="number" label="Adoptante" />
+        <.input
+          field="adoptante"
+          name="adoptante"
+          value={@current_scope.usuario.email}
+          type="tex"
+          label="Adoptante"
+          disabled
+        />
         <.input
           value={@mascota_nombre}
           field={@mascota_nombre}
@@ -39,10 +45,39 @@ defmodule PetsWeb.SolicitudAdopcionLive.Form do
 
   @impl true
   def mount(params, _session, socket) do
-    {:ok,
-     socket
-     |> assign(:return_to, return_to(params["return_to"]))
-     |> apply_action(socket.assigns.live_action, params)}
+    if socket.assigns.live_action == :new do
+      mascota = Mascotas.get_mascota(params["mascota_id"])
+
+      case mascota do
+        nil ->
+          {:ok,
+           socket
+           |> put_flash(:error, "La mascota no existe.")
+           |> push_navigate(to: "/mascotas")
+           |> Map.put(:halted, true)}
+
+        mascota ->
+          if mascota.estado != :EnAdopcion ||
+               mascota.usuario_id == socket.assigns.current_scope.usuario.id do
+            {:ok,
+             socket
+             |> put_flash(:error, "No puedes hacer esta solicitud.")
+             |> push_navigate(to: ~p"/mascotas/#{mascota.id}")
+             |> Map.put(:halted, true)}
+          else
+            {:ok,
+             socket
+             |> assign(:mascota, mascota)
+             |> assign(:return_to, return_to(params["return_to"]))
+             |> apply_action(socket.assigns.live_action, params)}
+          end
+      end
+    else
+      {:ok,
+       socket
+       |> assign(:return_to, return_to(params["return_to"]))
+       |> apply_action(socket.assigns.live_action, params)}
+    end
   end
 
   defp return_to("show"), do: "show"
@@ -63,9 +98,13 @@ defmodule PetsWeb.SolicitudAdopcionLive.Form do
   end
 
   defp apply_action(socket, :new, _params) do
+    mascota = Mascotas.get_mascota(_params["mascota_id"])
+
     solicitud_adopcion = %SolicitudAdopcion{
-      usuario_id: socket.assigns.current_scope.usuario.id,
+      adoptante_id: socket.assigns.current_scope.usuario.id,
+      refugio_id: mascota.usuario_id,
       mascota_id: _params["mascota_id"],
+      fecha_solicitud: NaiveDateTime.utc_now(),
       estado: :pendiente
     }
 
@@ -144,8 +183,8 @@ defmodule PetsWeb.SolicitudAdopcionLive.Form do
     end
   end
 
-  defp return_path(_scope, "index", _solicitud_adopcion), do: ~p"/solicitudes_adopcion"
+  defp return_path(_scope, "index", _solicitud_adopcion), do: ~p"/solicitudes-adopcion"
 
   defp return_path(_scope, "show", solicitud_adopcion),
-    do: ~p"/solicitudes_adopcion/#{solicitud_adopcion}"
+    do: ~p"/solicitudes-adopcion/#{solicitud_adopcion}"
 end

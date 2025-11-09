@@ -41,9 +41,17 @@ defmodule PetsWeb.Layouts do
               <li>
                 <.social_dropdown />
               </li>
+              <%= if @current_scope.usuario do %>
+                <li>
+                  <.adopciones_dropdown />
+                </li>
+              <% end %>
               <%= if @current_scope && has_user_shelter?(@current_scope) do %>
                 <li>
                   <.shelter_dropdown />
+                </li>
+                <li>
+                <.adopciones_dropdown />
                 </li>
               <% end %>
               <%= if @current_scope && has_user_admin?(@current_scope) do %>
@@ -291,6 +299,25 @@ defmodule PetsWeb.Layouts do
     </div>
     """
   end
+
+  attr :id, :string, default: "adopciones-dropdown"
+
+  def adopciones_dropdown(assigns) do
+   ~H"""
+   <div class="dropdown dropdown-end" id={@id}>
+     <div tabindex="0" role="button" class="btn btn-ghost m-1">
+       <span>Adopciones</span>
+       <.icon name="hero-chevron-down" class="size-4" />
+     </div>
+
+     <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64">
+       <li><a href={~p"/solicitudes-adopcion"}><.icon name="hero-shopping-bag" />Solicitudes de Adopción</a></li>
+     </ul>
+   </div>
+
+   """
+  end
+
 
   defp has_user_admin?(%{usuario: %{roles: roles}}) when is_list(roles) do
     "admin" in roles

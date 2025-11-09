@@ -1,4 +1,5 @@
 defmodule PetsWeb.MascotaLive.Show do
+  alias Pets.Adopciones
   use PetsWeb, :live_view
 
   alias Pets.Mascotas
@@ -42,10 +43,8 @@ defmodule PetsWeb.MascotaLive.Show do
         </:item>
       </.list>
 
-      <%= if can_adopt?(@current_scope, @mascota) do %>
-        <.button navigate={
-          ~p"/solicitudes/crear?mascota_id=#{@mascota.id}&mascota_nombre=#{@mascota.nombre}"
-        }>
+      <%= if can_adopt?(@current_scope, @mascota) && !@solicitud_creada do %>
+        <.button phx-click="create_solicitud" phx-value-id={@mascota.id}>
           Crear Solicitud de Adopción
         </.button>
       <% end %>
@@ -56,7 +55,8 @@ defmodule PetsWeb.MascotaLive.Show do
   defp can_adopt?(nil, _), do: false
 
   defp can_adopt?(scope, mascota) do
-    mascota.estado == :EnAdopcion && "refugio" not in scope.usuario.roles
+    mascota.estado == :EnAdopcion && mascota.usuario_id != scope.usuario.id &&
+      "refugio" not in scope.usuario.roles
   end
 
   @impl true
@@ -65,8 +65,14 @@ defmodule PetsWeb.MascotaLive.Show do
       Mascotas.subscribe_mascotas(socket.assigns.current_scope)
     end
 
+    solicitud_creada =
+      if Adopciones.get_solicitud_by_scope(socket.assigns.current_scope, id),
+        do: true,
+        else: false
+
     {:ok,
      socket
+     |> assign(:solicitud_creada, solicitud_creada)
      |> assign(:page_title, "Ver Mascota")
      |> assign(:mascota, Mascotas.get_mascota_for_show!(socket.assigns.current_scope, id))}
   end
@@ -92,5 +98,25 @@ defmodule PetsWeb.MascotaLive.Show do
   def handle_info({type, %Pets.Mascotas.Mascota{}}, socket)
       when type in [:created, :updated, :deleted] do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("create_solicitud", %{"id" => id}, socket) do
+    if Adopciones.get_solicitud_by_scope(socket.assigns.current_scope, id) do
+      {:error, socket |> put_flash(:error, "Ya existe solicitud.")}
+    end
+
+    if Adopciones.create_solicitud_adopcion(socket.assigns.current_scope, %{
+         estado: :pendiente,
+         fecha_solicitud: NaiveDateTime.utc_now(),
+         adoptante_id: socket.assigns.current_scope.usuario.id,
+         mascota_id: id,
+         refugio_id: socket.assigns.mascota.usuario_id
+       }) do
+      {:noreply,
+       socket
+       |> put_flash(:success, "Solicitud Creada con éxito")
+       |> assign(:solicitud_creada, true)}
+    end
   end
 end

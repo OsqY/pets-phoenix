@@ -9,7 +9,7 @@ defmodule PetsWeb.UsuarioSessionController do
   end
 
   def create(conn, params) do
-    create(conn, params, "Bienvenido(a) devuelta!")
+    create(conn, params, "¡Bienvenido(a) devuelta!")
   end
 
   # magic link login
@@ -40,7 +40,7 @@ defmodule PetsWeb.UsuarioSessionController do
     else
       # In order to prevent user enumeration attacks, don't disclose whether the email is registered.
       conn
-      |> put_flash(:error, "Invalid email or password")
+      |> put_flash(:error, "Correo electrónico o contraseña incorrectos.")
       |> put_flash(:email, String.slice(email, 0, 160))
       |> redirect(to: ~p"/usuario/log-in")
     end

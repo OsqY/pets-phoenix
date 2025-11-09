@@ -9,7 +9,7 @@ defmodule PetsWeb.UsuarioLive.Confirmation do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="mx-auto max-w-sm">
         <div class="text-center">
-          <.header>Welcome {@usuario.email}</.header>
+          <.header>Bienvenido(a) {@usuario.email}</.header>
         </div>
 
         <.form
@@ -25,13 +25,13 @@ defmodule PetsWeb.UsuarioLive.Confirmation do
           <.button
             name={@form[:remember_me].name}
             value="true"
-            phx-disable-with="Confirming..."
+            phx-disable-with="Confirmando..."
             class="btn btn-primary w-full"
           >
-            Confirm and stay logged in
+            Confirmar e Iniciar Sesión
           </.button>
-          <.button phx-disable-with="Confirming..." class="btn btn-primary btn-soft w-full mt-2">
-            Confirm and log in only this time
+          <.button phx-disable-with="Confirmando..." class="btn btn-primary btn-soft w-full mt-2">
+            Confirmar e Iniciar Sesión solo esta vez
           </.button>
         </.form>
 
@@ -46,20 +46,23 @@ defmodule PetsWeb.UsuarioLive.Confirmation do
         >
           <input type="hidden" name={@form[:token].name} value={@form[:token].value} />
           <%= if @current_scope do %>
-            <.button phx-disable-with="Logging in..." class="btn btn-primary w-full">
-              Log in
+            <.button phx-disable-with="Iniciando sesión..." class="btn btn-primary w-full">
+              Iniciar Sesión
             </.button>
           <% else %>
             <.button
               name={@form[:remember_me].name}
               value="true"
-              phx-disable-with="Logging in..."
+              phx-disable-with="Iniciando sesión..."
               class="btn btn-primary w-full"
             >
-              Keep me logged in on this device
+              Dejar mi cuenta iniciada en este dispositivo
             </.button>
-            <.button phx-disable-with="Logging in..." class="btn btn-primary btn-soft w-full mt-2">
-              Log me in only this time
+            <.button
+              phx-disable-with="Iniciando sesión..."
+              class="btn btn-primary btn-soft w-full mt-2"
+            >
+              Iniciar Sesión solo esta vez
             </.button>
           <% end %>
         </.form>

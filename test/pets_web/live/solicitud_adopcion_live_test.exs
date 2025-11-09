@@ -20,19 +20,19 @@ defmodule PetsWeb.SolicitudAdopcionLiveTest do
     setup [:create_solicitud_adopcion]
 
     test "lists all solicitudes_adopcion", %{conn: conn} do
-      {:ok, _index_live, html} = live(conn, ~p"/solicitudes_adopcion")
+      {:ok, _index_live, html} = live(conn, ~p"/solicitudes-adopcion")
 
       assert html =~ "Listing Solicitudes adopcion"
     end
 
     test "saves new solicitud_adopcion", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, ~p"/solicitudes_adopcion")
+      {:ok, index_live, _html} = live(conn, ~p"/solicitudes-adopcion")
 
       assert {:ok, form_live, _} =
                index_live
                |> element("a", "New Solicitud adopcion")
                |> render_click()
-               |> follow_redirect(conn, ~p"/solicitudes_adopcion/new")
+               |> follow_redirect(conn, ~p"/solicitudes-adopcion/new")
 
       assert render(form_live) =~ "New Solicitud adopcion"
 
@@ -44,20 +44,20 @@ defmodule PetsWeb.SolicitudAdopcionLiveTest do
                form_live
                |> form("#solicitud_adopcion-form", solicitud_adopcion: @create_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/solicitudes_adopcion")
+               |> follow_redirect(conn, ~p"/solicitudes-adopcion")
 
       html = render(index_live)
       assert html =~ "Solicitud adopcion created successfully"
     end
 
     test "updates solicitud_adopcion in listing", %{conn: conn, solicitud_adopcion: solicitud_adopcion} do
-      {:ok, index_live, _html} = live(conn, ~p"/solicitudes_adopcion")
+      {:ok, index_live, _html} = live(conn, ~p"/solicitudes-adopcion")
 
       assert {:ok, form_live, _html} =
                index_live
                |> element("#solicitudes_adopcion-#{solicitud_adopcion.id} a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/solicitudes_adopcion/#{solicitud_adopcion}/edit")
+               |> follow_redirect(conn, ~p"/solicitudes-adopcion/#{solicitud_adopcion}/edit")
 
       assert render(form_live) =~ "Edit Solicitud adopcion"
 
@@ -69,14 +69,14 @@ defmodule PetsWeb.SolicitudAdopcionLiveTest do
                form_live
                |> form("#solicitud_adopcion-form", solicitud_adopcion: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/solicitudes_adopcion")
+               |> follow_redirect(conn, ~p"/solicitudes-adopcion")
 
       html = render(index_live)
       assert html =~ "Solicitud adopcion updated successfully"
     end
 
     test "deletes solicitud_adopcion in listing", %{conn: conn, solicitud_adopcion: solicitud_adopcion} do
-      {:ok, index_live, _html} = live(conn, ~p"/solicitudes_adopcion")
+      {:ok, index_live, _html} = live(conn, ~p"/solicitudes-adopcion")
 
       assert index_live |> element("#solicitudes_adopcion-#{solicitud_adopcion.id} a", "Delete") |> render_click()
       refute has_element?(index_live, "#solicitudes_adopcion-#{solicitud_adopcion.id}")
@@ -87,19 +87,19 @@ defmodule PetsWeb.SolicitudAdopcionLiveTest do
     setup [:create_solicitud_adopcion]
 
     test "displays solicitud_adopcion", %{conn: conn, solicitud_adopcion: solicitud_adopcion} do
-      {:ok, _show_live, html} = live(conn, ~p"/solicitudes_adopcion/#{solicitud_adopcion}")
+      {:ok, _show_live, html} = live(conn, ~p"/solicitudes-adopcion/#{solicitud_adopcion}")
 
       assert html =~ "Show Solicitud adopcion"
     end
 
     test "updates solicitud_adopcion and returns to show", %{conn: conn, solicitud_adopcion: solicitud_adopcion} do
-      {:ok, show_live, _html} = live(conn, ~p"/solicitudes_adopcion/#{solicitud_adopcion}")
+      {:ok, show_live, _html} = live(conn, ~p"/solicitudes-adopcion/#{solicitud_adopcion}")
 
       assert {:ok, form_live, _} =
                show_live
                |> element("a", "Edit")
                |> render_click()
-               |> follow_redirect(conn, ~p"/solicitudes_adopcion/#{solicitud_adopcion}/edit?return_to=show")
+               |> follow_redirect(conn, ~p"/solicitudes-adopcion/#{solicitud_adopcion}/edit?return_to=show")
 
       assert render(form_live) =~ "Edit Solicitud adopcion"
 
@@ -111,7 +111,7 @@ defmodule PetsWeb.SolicitudAdopcionLiveTest do
                form_live
                |> form("#solicitud_adopcion-form", solicitud_adopcion: @update_attrs)
                |> render_submit()
-               |> follow_redirect(conn, ~p"/solicitudes_adopcion/#{solicitud_adopcion}")
+               |> follow_redirect(conn, ~p"/solicitudes-adopcion/#{solicitud_adopcion}")
 
       html = render(show_live)
       assert html =~ "Solicitud adopcion updated successfully"

@@ -70,7 +70,7 @@ defmodule PetsWeb.MascotaLive.Form do
     {:ok,
      socket
      |> assign(:return_to, return_to(params["return_to"]))
-     |> assign(estados_options: Mascota.estados_options())
+     |> assign(estados_options: Mascota.estado_options())
      |> assign(energia_options: Mascota.energia_options())
      |> apply_action(socket.assigns.live_action, params)}
   end

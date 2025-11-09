@@ -21,39 +21,28 @@ defmodule PetsWeb.MascotaLive.Index do
           </:actions>
         </.header>
 
-        <div class="mb-8 p-6 rounded-xl border border-slate-700">
-          <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div class="flex-1 w-full">
-              <label for="search" class="sr-only">Buscar mascotas</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <.icon name="hero-magnifying-glass" class="h-5 w-5 text-gray-500" />
+        <form phx-change="search" phx-debounce="300">
+          <div class="mb-8 p-6 rounded-xl border border-slate-700">
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+              <div class="flex-1 w-full">
+                <label for="search" class="sr-only">Buscar mascotas</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <.icon name="hero-magnifying-glass" class="h-5 w-5 text-gray-500" />
+                  </div>
+                  <input
+                    type="text"
+                    name="query"
+                    id="query"
+                    value={@query}
+                    class="block w-full pl-10 pr-3 py-2 border border-slate-600 rounded-lg text-gray-200 placeholder-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder="Buscar por nombre, especie..."
+                  />
                 </div>
-                <input
-                  type="text"
-                  name="search"
-                  id="search"
-                  class="block w-full pl-10 pr-3 py-2 border border-slate-600 rounded-lg text-gray-200 placeholder-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                  placeholder="Buscar por nombre, especie..."
-                  phx-debounce="300"
-                />
               </div>
             </div>
-            <div class="flex gap-3">
-              <select class="block w-full md:w-auto px-3 py-2 border border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2">
-                <option>Todas las especies</option>
-                <option>Perros</option>
-                <option>Gatos</option>
-              </select>
-              <select class="block w-full md:w-auto px-3 py-2 border border-slate-600 rounded-lg late-700 text-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
-                <option>Cualquier tamaño</option>
-                <option>Pequeño</option>
-                <option>Mediano</option>
-                <option>Grande</option>
-              </select>
-            </div>
           </div>
-        </div>
+        </form>
 
         <div class="grid grid-cols-1 gap-6">
           <div
@@ -204,7 +193,8 @@ defmodule PetsWeb.MascotaLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Listing Mascotas")
+     |> assign(:page_title, "Mascotas")
+     |> assign(:query, "")
      |> stream(:mascotas, list_mascotas(socket.assigns.current_scope))}
   end
 
@@ -225,5 +215,21 @@ defmodule PetsWeb.MascotaLive.Index do
 
   defp list_mascotas(current_scope) do
     Mascotas.list_mascotas()
+  end
+
+  @impl true
+  def handle_event("search", params, socket) do
+    query = Map.get(params, "query", "")
+
+    mascotas = Mascotas.list_mascotas(socket.assigns.current_scope, query)
+
+    socket = stream(socket, :mascotas, mascotas, reset: true)
+
+    {:noreply, assign(socket, query: query)}
+  end
+
+  @impl true
+  def handle_event("search", %{"_target" => ["_target_action"]}, socket) do
+    {:noreply, socket}
   end
 end

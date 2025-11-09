@@ -1,4 +1,5 @@
 defmodule PetsWeb.SolicitudAdopcionLive.Show do
+  import Pets.Adopciones.SolicitudAdopcion
   use PetsWeb, :live_view
 
   alias Pets.Adopciones
@@ -8,24 +9,30 @@ defmodule PetsWeb.SolicitudAdopcionLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Solicitud adopcion {@solicitud_adopcion.id}
-        <:subtitle>This is a solicitud_adopcion record from your database.</:subtitle>
+        Solicitud de Adopción para {@solicitud_adopcion.mascota.nombre}
+        <:subtitle>Solicitud de Adopción de {@solicitud_adopcion.adoptante.email}</:subtitle>
         <:actions>
-          <.button navigate={~p"/solicitudes_adopcion"}>
+          <.button navigate={~p"/solicitudes-adopcion"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/solicitudes_adopcion/#{@solicitud_adopcion}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit solicitud_adopcion
+          <.button
+            variant="primary"
+            navigate={
+              ~p"/solicitudes-adopcion/#{@solicitud_adopcion}/seguimientos/crear?solicitud-id=#{@solicitud_adopcion.id}&adoptante-id=#{@solicitud_adopcion.adoptante.id}"
+            }
+          >
+            Crear Seguimiento
           </.button>
         </:actions>
       </.header>
-
       <.list>
-        <:item title="Estado">{@solicitud_adopcion.estado}</:item>
-        <:item title="Fecha solicitud">{@solicitud_adopcion.fecha_solicitud}</:item>
-        <:item title="Fecha revision">{@solicitud_adopcion.fecha_revision}</:item>
-        <:item title="Adoptante">{@solicitud_adopcion.adoptante_id}</:item>
-        <:item title="Mascota">{@solicitud_adopcion.mascota_id}</:item>
+        <:item title="Estado de Solicitud">{humanize_estado(@solicitud_adopcion.estado)}</:item>
+        <:item title="Fecha de Solicitud">{@solicitud_adopcion.fecha_solicitud}</:item>
+        <:item title="Fecha de Revisión">
+          {if @solicitud_adopcion.fecha_revision,
+            do: @solicitud_adopcion.fecha_revision,
+            else: "Su Solicitud no ha sido revisada."}
+        </:item>
       </.list>
     </Layouts.app>
     """
@@ -39,8 +46,11 @@ defmodule PetsWeb.SolicitudAdopcionLive.Show do
 
     {:ok,
      socket
-     |> assign(:page_title, "Show Solicitud adopcion")
-     |> assign(:solicitud_adopcion, Adopciones.get_solicitud_adopcion!(socket.assigns.current_scope, id))}
+     |> assign(:page_title, "Ver Solicitud")
+     |> assign(
+       :solicitud_adopcion,
+       Adopciones.get_solicitud_adopcion!(socket.assigns.current_scope, id)
+     )}
   end
 
   @impl true
@@ -57,12 +67,16 @@ defmodule PetsWeb.SolicitudAdopcionLive.Show do
       ) do
     {:noreply,
      socket
-     |> put_flash(:error, "The current solicitud_adopcion was deleted.")
-     |> push_navigate(to: ~p"/solicitudes_adopcion")}
+     |> put_flash(:error, "Esta solicitud ha sido eliminada.")
+     |> push_navigate(to: ~p"/solicitudes-adopcion")}
   end
 
   def handle_info({type, %Pets.Adopciones.SolicitudAdopcion{}}, socket)
       when type in [:created, :updated, :deleted] do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("create_seguimiento", unsigned_params, socket) do
   end
 end

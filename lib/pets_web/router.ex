@@ -72,14 +72,14 @@ defmodule PetsWeb.Router do
       live "/comentarios/:id/editar", ComentarioLive.Form, :edit
       live "/mascotas/crear", MascotaLive.Form, :new
       live "/mascotas/:id/editar", MascotaLive.Form, :edit
-      live "/solicitudes", SolicitudAdopcionLive.Index, :index
-      live "/solicitudes/crear", SolicitudAdopcionLive.Form, :new
-      live "/solicitudes/:id/editar", SolicitudAdopcionLive.Form, :edit
-      live "/solicitudes/:id", SolicitudAdopcionLive.Show, :show
-      live "/solicitudes/:id/seguimientos", SeguimientoLive.Index, :index
-      live "/solicitudes/:id/seguimientos/crear", SeguimientoLive.Form, :new
-      live "/solicitudes/:id/seguimientos/:id/editar", SeguimientoLive.Form, :edit
-      live "/solicitudes/:id/seguimientos/:id", SeguimientoLive.Index, :show
+      live "/solicitudes-adopcion", SolicitudAdopcionLive.Index, :index
+      live "/solicitudes-adopcion/crear", SolicitudAdopcionLive.Form, :new
+      live "/solicitudes-adopcion/:id/editar", SolicitudAdopcionLive.Form, :edit
+      live "/solicitudes-adopcion/:id", SolicitudAdopcionLive.Show, :show
+      live "/solicitudes-adopcion/:id/seguimientos", SeguimientoLive.Index, :index
+      live "/solicitudes-adopcion/:id/seguimientos/crear", SeguimientoLive.Form, :new
+      live "/solicitudes-adopcion/:id/seguimientos/:id/editar", SeguimientoLive.Form, :edit
+      live "/solicitudes-adopcion/:id/seguimientos/:id", SeguimientoLive.Index, :show
     end
 
     post "/usuario/update-password", UsuarioSessionController, :update_password
