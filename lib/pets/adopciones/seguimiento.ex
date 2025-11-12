@@ -16,8 +16,8 @@ defmodule Pets.Adopciones.Seguimiento do
   @doc false
   def changeset(seguimiento, attrs, usuario_scope) do
     seguimiento
-    |> cast(attrs, [:fecha, :notas, :solicitud_id, :responsable_id])
-    |> validate_required([:fecha, :notas, :solicitud_id, :responsable_id])
-    |> put_change(:usuario_id, usuario_scope.usuario.id)
+    |> cast(attrs, [:fecha, :notas, :solicitud_id, :responsable_id, :usuario_id])
+    |> validate_required([:notas])
+    |> put_change(:responsable_id, usuario_scope.usuario.id)
   end
 end

@@ -5,7 +5,6 @@ defmodule Pets.Chats do
 
   import Ecto.Query, warn: false
   alias Pets.Repo
-
   alias Pets.Chats.Conversacion
   alias Pets.Cuentas.Scope
 
@@ -41,7 +40,12 @@ defmodule Pets.Chats do
 
   """
   def list_conversaciones(%Scope{} = scope) do
-    Repo.all_by(Conversacion, usuario_id: scope.usuario.id)
+    conversacion_query =
+      from c in Conversacion,
+        where: c.emisor_id == ^scope.usuario.id or c.receptor_id == ^scope.usuario.id,
+        preload: [:emisor, :receptor]
+
+    Repo.all(conversacion_query)
   end
 
   @doc """
@@ -59,7 +63,15 @@ defmodule Pets.Chats do
 
   """
   def get_conversacion!(%Scope{} = scope, id) do
-    Repo.get_by!(Conversacion, id: id, usuario_id: scope.usuario.id)
+    mensaje_query = from e in Mensaje, select: [:id, :contenido]
+
+    conversacion_query =
+      from c in Conversacion,
+        where:
+          c.emisor_id == ^scope.usuario.id or (c.receptor_id == ^scope.usuario.id and c.id == ^id),
+        preload: [:emisor, :receptor, mensajes: ^mensaje_query]
+
+    Repo.get_by!(conversacion_query)
   end
 
   @doc """
@@ -77,7 +89,7 @@ defmodule Pets.Chats do
   def create_conversacion(%Scope{} = scope, attrs) do
     with {:ok, conversacion = %Conversacion{}} <-
            %Conversacion{}
-           |> Conversacion.changeset(attrs, scope)
+           |> Conversacion.changeset(attrs)
            |> Repo.insert() do
       broadcast_conversacion(scope, {:created, conversacion})
       {:ok, conversacion}
@@ -179,8 +191,13 @@ defmodule Pets.Chats do
       [%Mensaje{}, ...]
 
   """
-  def list_mensajes(%Scope{} = scope) do
-    Repo.all_by(Mensaje, usuario_id: scope.usuario.id)
+  def list_mensajes(%Conversacion{} = conversacion) do
+    Repo.all(
+      from m in Mensaje,
+        where: m.conversacion_id == ^conversacion.id,
+        preload: [:emisor],
+        order_by: [asc: m.fecha_hora]
+    )
   end
 
   @doc """

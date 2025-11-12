@@ -3,18 +3,17 @@ defmodule Pets.Chats.Conversacion do
   import Ecto.Changeset
 
   schema "conversaciones" do
-    field :emisor_id, :integer
-    field :receptor_id, :integer
-    field :usuario_id, :id
+    has_many :mensajes, Pets.Chats.Mensaje
+    belongs_to :emisor, Pets.Cuentas.Usuario
+    belongs_to :receptor, Pets.Cuentas.Usuario
 
     timestamps(type: :utc_datetime)
   end
 
   @doc false
-  def changeset(conversacion, attrs, usuario_scope) do
+  def changeset(conversacion, attrs) do
     conversacion
     |> cast(attrs, [:emisor_id, :receptor_id])
     |> validate_required([:emisor_id, :receptor_id])
-    |> put_change(:usuario_id, usuario_scope.usuario.id)
   end
 end

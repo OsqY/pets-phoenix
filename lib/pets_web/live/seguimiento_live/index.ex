@@ -8,12 +8,7 @@ defmodule PetsWeb.SeguimientoLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Listing Seguimientos
-        <:actions>
-          <.button variant="primary" navigate={~p"/seguimientos/new"}>
-            <.icon name="hero-plus" /> New Seguimiento
-          </.button>
-        </:actions>
+        Seguimientos
       </.header>
 
       <.table
@@ -27,17 +22,21 @@ defmodule PetsWeb.SeguimientoLive.Index do
         <:col :let={{_id, seguimiento}} label="Responsable">{seguimiento.responsable_id}</:col>
         <:action :let={{_id, seguimiento}}>
           <div class="sr-only">
-            <.link navigate={~p"/seguimientos/#{seguimiento}"}>Show</.link>
+            <.link navigate={~p"/seguimientos/#{seguimiento}"}>Ver</.link>
           </div>
-          <.link navigate={~p"/seguimientos/#{seguimiento}/edit"}>Edit</.link>
+          <%= if "refugio" in @current_scope.usuario.roles do %>
+            <.link navigate={~p"/seguimientos/#{seguimiento}/edit"}>Editar</.link>
+          <% end %>
         </:action>
         <:action :let={{id, seguimiento}}>
-          <.link
-            phx-click={JS.push("delete", value: %{id: seguimiento.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
-          >
-            Delete
-          </.link>
+          <%= if "refugio" in @current_scope.usuario.roles do %>
+            <.link
+              phx-click={JS.push("delete", value: %{id: seguimiento.id}) |> hide("##{id}")}
+              data-confirm="¿Desea eliminar este seguimiento?"
+            >
+              Borrar
+            </.link>
+          <% end %>
         </:action>
       </.table>
     </Layouts.app>
@@ -52,7 +51,7 @@ defmodule PetsWeb.SeguimientoLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Listing Seguimientos")
+     |> assign(:page_title, "Seguimientos")
      |> stream(:seguimientos, list_seguimientos(socket.assigns.current_scope))}
   end
 
@@ -67,10 +66,15 @@ defmodule PetsWeb.SeguimientoLive.Index do
   @impl true
   def handle_info({type, %Pets.Adopciones.Seguimiento{}}, socket)
       when type in [:created, :updated, :deleted] do
-    {:noreply, stream(socket, :seguimientos, list_seguimientos(socket.assigns.current_scope), reset: true)}
+    {:noreply,
+     stream(socket, :seguimientos, list_seguimientos(socket.assigns.current_scope), reset: true)}
   end
 
   defp list_seguimientos(current_scope) do
-    Adopciones.list_seguimientos(current_scope)
+    if "refugio" in current_scope.usuario.roles do
+      Adopciones.list_seguimientos(current_scope)
+    else
+      Adopciones.list_seguimientos_adoptante(current_scope)
+    end
   end
 end

@@ -11,7 +11,7 @@ defmodule Pets.Application do
       PetsWeb.Telemetry,
       Pets.Repo,
       {DNSCluster, query: Application.get_env(:pets, :dns_cluster_query) || :ignore},
-      {Phoenix.PubSub, name: Pets.PubSub},
+      {Phoenix.PubSub, name: Pets.PubSub, adapter: Phoenix.PubSub.PG2},
       # Start a worker by calling: Pets.Worker.start_link(arg)
       # {Pets.Worker, arg},
       # Start to serve requests, typically the last entry

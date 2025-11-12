@@ -14,8 +14,11 @@ defmodule PetsWeb.SeguimientoLive.Form do
       </.header>
 
       <.form for={@form} id="seguimiento-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:fecha]} type="date" label="Fecha" />
+        <.input field={@form[:fecha]} type="hidden" />
         <.input field={@form[:notas]} type="textarea" label="Notas" />
+        <.input field={@form[:solicitud_id]} type="hidden" />
+        <.input field={@form[:responsable_id]} type="hidden" />
+        <.input field={@form[:usuario_id]} type="hidden" />
         <footer>
           <.button phx-disable-with="Guardando..." variant="primary">Guardar Seguimiento</.button>
           <.button navigate={return_path(@current_scope, @return_to, @seguimiento)}>Cancelar</.button>
@@ -52,7 +55,7 @@ defmodule PetsWeb.SeguimientoLive.Form do
     seguimiento = %Seguimiento{
       solicitud_id: _params["solicitud-id"],
       responsable_id: socket.assigns.current_scope.usuario.id,
-      usuario_id: _params["adoptante_id"],
+      usuario_id: _params["adoptante-id"],
       fecha: NaiveDateTime.utc_now()
     }
 
@@ -73,8 +76,6 @@ defmodule PetsWeb.SeguimientoLive.Form do
         socket.assigns.seguimiento,
         seguimiento_params
       )
-
-    IO.inspect(changeset, label: "Changeset")
 
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end

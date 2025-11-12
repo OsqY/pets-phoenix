@@ -80,6 +80,7 @@ defmodule PetsWeb.Router do
       live "/solicitudes-adopcion/:id/seguimientos/crear", SeguimientoLive.Form, :new
       live "/solicitudes-adopcion/:id/seguimientos/:id/editar", SeguimientoLive.Form, :edit
       live "/solicitudes-adopcion/:id/seguimientos/:id", SeguimientoLive.Index, :show
+      live "/chat", ChatLive, :index
     end
 
     post "/usuario/update-password", UsuarioSessionController, :update_password

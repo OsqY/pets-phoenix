@@ -7,6 +7,7 @@ defmodule Pets.Cuentas do
   alias Pets.Repo
 
   alias Pets.Cuentas.{Usuario, UsuarioToken, UsuarioNotifier}
+  alias Pets.Cuentas.Scope
 
   ## Database getters
 
@@ -24,6 +25,17 @@ defmodule Pets.Cuentas do
   """
   def get_usuario_by_email(email) when is_binary(email) do
     Repo.get_by(Usuario, email: email)
+  end
+
+  def search_users(%Scope{} = scope, params) do
+    params = "%#{params}%"
+    usuario_email = "%#{scope.usuario.email}%"
+
+    Repo.all(
+      from u in Usuario,
+        where: ilike(u.email, ^params) and not ilike(u.email, ^usuario_email),
+        select: struct(u, [:id, :email])
+    )
   end
 
   @doc """
@@ -124,7 +136,9 @@ defmodule Pets.Cuentas do
            %UsuarioToken{sent_to: email} <- Repo.one(query),
            {:ok, usuario} <- Repo.update(Usuario.email_changeset(usuario, %{email: email})),
            {_count, _result} <-
-             Repo.delete_all(from(UsuarioToken, where: [usuario_id: ^usuario.id, context: ^context])) do
+             Repo.delete_all(
+               from(UsuarioToken, where: [usuario_id: ^usuario.id, context: ^context])
+             ) do
         {:ok, usuario}
       else
         _ -> {:error, :transaction_aborted}
@@ -255,12 +269,21 @@ defmodule Pets.Cuentas do
       {:ok, %{to: ..., body: ...}}
 
   """
-  def deliver_usuario_update_email_instructions(%Usuario{} = usuario, current_email, update_email_url_fun)
+  def deliver_usuario_update_email_instructions(
+        %Usuario{} = usuario,
+        current_email,
+        update_email_url_fun
+      )
       when is_function(update_email_url_fun, 1) do
-    {encoded_token, usuario_token} = UsuarioToken.build_email_token(usuario, "change:#{current_email}")
+    {encoded_token, usuario_token} =
+      UsuarioToken.build_email_token(usuario, "change:#{current_email}")
 
     Repo.insert!(usuario_token)
-    UsuarioNotifier.deliver_update_email_instructions(usuario, update_email_url_fun.(encoded_token))
+
+    UsuarioNotifier.deliver_update_email_instructions(
+      usuario,
+      update_email_url_fun.(encoded_token)
+    )
   end
 
   @doc """
@@ -288,7 +311,9 @@ defmodule Pets.Cuentas do
       with {:ok, usuario} <- Repo.update(changeset) do
         tokens_to_expire = Repo.all_by(UsuarioToken, usuario_id: usuario.id)
 
-        Repo.delete_all(from(t in UsuarioToken, where: t.id in ^Enum.map(tokens_to_expire, & &1.id)))
+        Repo.delete_all(
+          from(t in UsuarioToken, where: t.id in ^Enum.map(tokens_to_expire, & &1.id))
+        )
 
         {:ok, {usuario, tokens_to_expire}}
       end

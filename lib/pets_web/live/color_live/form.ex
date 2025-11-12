@@ -22,8 +22,8 @@ defmodule PetsWeb.ColorLive.Form do
           label="Seleccionar Especie"
         />
         <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Color</.button>
-          <.button navigate={return_path(@current_scope, @return_to, @color)}>Cancel</.button>
+          <.button phx-disable-with="Guardando..." variant="primary">Guardar Color</.button>
+          <.button navigate={return_path(@current_scope, @return_to, @color)}>Cancelar</.button>
         </footer>
       </.form>
     </Layouts.app>

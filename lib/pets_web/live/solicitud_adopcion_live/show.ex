@@ -15,14 +15,20 @@ defmodule PetsWeb.SolicitudAdopcionLive.Show do
           <.button navigate={~p"/solicitudes-adopcion"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button
-            variant="primary"
-            navigate={
-              ~p"/solicitudes-adopcion/#{@solicitud_adopcion}/seguimientos/crear?solicitud-id=#{@solicitud_adopcion.id}&adoptante-id=#{@solicitud_adopcion.adoptante.id}"
-            }
-          >
-            Crear Seguimiento
+          <.button navigate={~p"/solicitudes-adopcion/#{@solicitud_adopcion}/seguimientos"}>
+            Ver Seguimientos <.icon name="hero-arrow-right" />
           </.button>
+
+          <%= if "refugio" in @current_scope.usuario.roles do %>
+            <.button
+              variant="primary"
+              navigate={
+                ~p"/solicitudes-adopcion/#{@solicitud_adopcion}/seguimientos/crear?solicitud-id=#{@solicitud_adopcion.id}&adoptante-id=#{@solicitud_adopcion.adoptante.id}"
+              }
+            >
+              Crear Seguimiento
+            </.button>
+          <% end %>
         </:actions>
       </.header>
       <.list>

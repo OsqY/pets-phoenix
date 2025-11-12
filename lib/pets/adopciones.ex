@@ -222,6 +222,10 @@ defmodule Pets.Adopciones do
 
   """
   def list_seguimientos(%Scope{} = scope) do
+    Repo.all_by(Seguimiento, responsable_id: scope.usuario.id)
+  end
+
+  def list_seguimientos_adoptante(%Scope{} = scope) do
     Repo.all_by(Seguimiento, usuario_id: scope.usuario.id)
   end
 
@@ -278,7 +282,7 @@ defmodule Pets.Adopciones do
 
   """
   def update_seguimiento(%Scope{} = scope, %Seguimiento{} = seguimiento, attrs) do
-    true = seguimiento.usuario_id == scope.usuario.id
+    true = seguimiento.responsable_id == scope.usuario.id
 
     with {:ok, seguimiento = %Seguimiento{}} <-
            seguimiento
@@ -302,7 +306,7 @@ defmodule Pets.Adopciones do
 
   """
   def delete_seguimiento(%Scope{} = scope, %Seguimiento{} = seguimiento) do
-    true = seguimiento.usuario_id == scope.usuario.id
+    true = seguimiento.responsable_id == scope.usuario.id
 
     with {:ok, seguimiento = %Seguimiento{}} <-
            Repo.delete(seguimiento) do

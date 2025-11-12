@@ -3,6 +3,7 @@ defmodule PetsWeb.Layouts do
   This module holds layouts and related functionality
   used by your application.
   """
+  use PetsWeb, :live_view
   use PetsWeb, :html
 
   # Embed all files in layouts/* within this module.
@@ -24,6 +25,8 @@ defmodule PetsWeb.Layouts do
   slot :inner_block, required: true
 
   def app(assigns) do
+    assigns = assign(assigns, :form, to_form(%{query: ""}))
+
     ~H"""
     <div class="drawer drawer-end">
       <input id="chat-drawer-toggle" type="checkbox" class="drawer-toggle" />
@@ -41,7 +44,7 @@ defmodule PetsWeb.Layouts do
               <li>
                 <.social_dropdown />
               </li>
-              <%= if @current_scope.usuario do %>
+              <%= if @current_scope do %>
                 <li>
                   <.adopciones_dropdown />
                 </li>
@@ -49,9 +52,6 @@ defmodule PetsWeb.Layouts do
               <%= if @current_scope && has_user_shelter?(@current_scope) do %>
                 <li>
                   <.shelter_dropdown />
-                </li>
-                <li>
-                <.adopciones_dropdown />
                 </li>
               <% end %>
               <%= if @current_scope && has_user_admin?(@current_scope) do %>
@@ -84,7 +84,11 @@ defmodule PetsWeb.Layouts do
           <label for="chat-drawer-toggle" aria-label="close sidebar" class="drawer-overlay"></label>
 
           <aside class="w-96 min-h-full bg-base-100 p-4">
-            <.chat_sidebar />
+            <.live_component
+              module={PetsWeb.ChatSideBar}
+              id="chat-sidebar"
+              current_scope={@current_scope}
+            />
           </aside>
         </div>
       <% end %>
@@ -188,75 +192,6 @@ defmodule PetsWeb.Layouts do
     """
   end
 
-  def chat_sidebar(assigns) do
-    ~H"""
-    <div class="flex flex-col h-full">
-      <h3 class="text-xl font-semibold mb-4 border-b border-base-300 pb-2">
-        Mensajes
-      </h3>
-
-      <div class="mb-4">
-        <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">Contactos</h4>
-        <ul class="menu p-0">
-          <li>
-            <a class="active">
-              <div class="avatar online">
-                <div class="w-8 rounded-full">
-                  <img src="https://ui-avatars.com/api/?name=Ana+Lopez&background=random" />
-                </div>
-              </div>
-              Ana López
-            </a>
-          </li>
-          <li>
-            <a>
-              <div class="avatar offline">
-                <div class="w-8 rounded-full">
-                  <img src="https://ui-avatars.com/api/?name=Juan+Perez&background=random" />
-                </div>
-              </div>
-              Juan Pérez
-            </a>
-          </li>
-          <li>
-            <a>
-              <div class="avatar online">
-                <div class="w-8 rounded-full">
-                  <img src="https://ui-avatars.com/api/?name=Maria+G&background=random" />
-                </div>
-              </div>
-              Maria G.
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      <div class="divider m-0"></div>
-
-      <div class="flex-1 overflow-y-auto my-4 p-2 bg-base-200 rounded-box">
-        <div class="chat chat-start">
-          <div class="chat-header text-xs opacity-50">Ana López</div>
-          <div class="chat-bubble">¡Hola! ¿Cómo estás?</div>
-        </div>
-        <div class="chat chat-end">
-          <div class="chat-bubble chat-bubble-primary">¡Hola Ana! Todo bien, ¿y tú?</div>
-        </div>
-        <div class="chat chat-start">
-          <div class="chat-header text-xs opacity-50">Ana López</div>
-          <div class="chat-bubble">¡Genial!</div>
-        </div>
-      </div>
-
-      <form class="flex space-x-2">
-        <input type="text" placeholder="Escribe un mensaje..." class="input input-bordered flex-1" />
-        <button type-="submit" class="btn btn-primary">
-          <.icon name="hero-paper-airplane" class="size-4" />
-        </button>
-      </form>
-    </div>
-    """
-  end
-
   attr :id, :string, default: "shelter-dropdown"
 
   def shelter_dropdown(assigns) do
@@ -303,21 +238,23 @@ defmodule PetsWeb.Layouts do
   attr :id, :string, default: "adopciones-dropdown"
 
   def adopciones_dropdown(assigns) do
-   ~H"""
-   <div class="dropdown dropdown-end" id={@id}>
-     <div tabindex="0" role="button" class="btn btn-ghost m-1">
-       <span>Adopciones</span>
-       <.icon name="hero-chevron-down" class="size-4" />
-     </div>
+    ~H"""
+    <div class="dropdown dropdown-end" id={@id}>
+      <div tabindex="0" role="button" class="btn btn-ghost m-1">
+        <span>Adopciones</span>
+        <.icon name="hero-chevron-down" class="size-4" />
+      </div>
 
-     <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64">
-       <li><a href={~p"/solicitudes-adopcion"}><.icon name="hero-shopping-bag" />Solicitudes de Adopción</a></li>
-     </ul>
-   </div>
-
-   """
+      <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-64">
+        <li>
+          <a href={~p"/solicitudes-adopcion"}>
+            <.icon name="hero-shopping-bag" />Solicitudes de Adopción
+          </a>
+        </li>
+      </ul>
+    </div>
+    """
   end
-
 
   defp has_user_admin?(%{usuario: %{roles: roles}}) when is_list(roles) do
     "admin" in roles
