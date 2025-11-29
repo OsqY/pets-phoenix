@@ -57,7 +57,7 @@ defmodule PetsWeb.DonacionDineroLive.Show do
       ) do
     {:noreply,
      socket
-     |> put_flash(:error, "The current donacion_dinero was deleted.")
+     |> put_flash(:error, "La donación fue eliminada.")
      |> push_navigate(to: ~p"/donaciones_dinero")}
   end
 

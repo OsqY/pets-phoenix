@@ -61,7 +61,7 @@ defmodule PetsWeb.ItemInventarioLive.Show do
       ) do
     {:noreply,
      socket
-     |> put_flash(:error, "The current item_inventario was deleted.")
+     |> put_flash(:error, "El item de inventario fue eliminado.")
      |> push_navigate(to: ~p"/items_inventario")}
   end
 

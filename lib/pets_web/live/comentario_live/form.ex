@@ -70,7 +70,7 @@ defmodule PetsWeb.ComentarioLive.Form do
       {:ok, comentario} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Comentario updated successfully")
+         |> put_flash(:info, "Comentario actualizado con éxito")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, comentario)
          )}
@@ -85,7 +85,7 @@ defmodule PetsWeb.ComentarioLive.Form do
       {:ok, comentario} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Comentario created successfully")
+         |> put_flash(:info, "Comentario creado con éxito")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, comentario)
          )}

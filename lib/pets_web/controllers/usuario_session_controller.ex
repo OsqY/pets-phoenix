@@ -25,7 +25,7 @@ defmodule PetsWeb.UsuarioSessionController do
       _ ->
         conn
         |> put_flash(:error, "El enlace es inválido o ha expirado.")
-        |> redirect(to: ~p"/usuario/log-in")
+        |> redirect(to: ~p"/usuario/iniciar-sesion")
     end
   end
 
@@ -42,7 +42,7 @@ defmodule PetsWeb.UsuarioSessionController do
       conn
       |> put_flash(:error, "Correo electrónico o contraseña incorrectos.")
       |> put_flash(:email, String.slice(email, 0, 160))
-      |> redirect(to: ~p"/usuario/log-in")
+      |> redirect(to: ~p"/usuario/iniciar-sesion")
     end
   end
 
@@ -55,7 +55,7 @@ defmodule PetsWeb.UsuarioSessionController do
     UsuarioAuth.disconnect_sessions(expired_tokens)
 
     conn
-    |> put_session(:usuario_return_to, ~p"/usuario/settings")
+    |> put_session(:usuario_return_to, ~p"/usuario/configuracion")
     |> create(params, "Contraseña actualizada.")
   end
 

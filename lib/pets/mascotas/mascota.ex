@@ -37,6 +37,11 @@ defmodule Pets.Mascotas.Mascota do
 
     has_many :posts, Pets.Posts.Post
 
+    embeds_many :imagenes, Imagenes, on_replace: :delete do
+      field :url, :string
+      field :imagen, :any, virtual: true
+    end
+
     timestamps(type: :utc_datetime)
   end
 
@@ -76,6 +81,7 @@ defmodule Pets.Mascotas.Mascota do
       :estado
     ])
     |> put_change(:usuario_id, usuario_scope.usuario.id)
+    |> cast_embed(:imagenes, with: &imagen_changeset/2)
   end
 
   def estado_options, do: @estado_options
@@ -91,5 +97,9 @@ defmodule Pets.Mascotas.Mascota do
     Enum.find_value(@energia_options, "N/A", fn {label, val} ->
       if val == atom, do: label
     end)
+  end
+
+  def imagen_changeset(imagen, params) do
+    imagen |> cast(params, [:url, :imagen])
   end
 end

@@ -54,7 +54,7 @@ defmodule PetsWeb.ImagenMascotaLive.Show do
       ) do
     {:noreply,
      socket
-     |> put_flash(:error, "The current imagen_mascota was deleted.")
+     |> put_flash(:error, "La imagen de mascota fue eliminada.")
      |> push_navigate(to: ~p"/imagenes_mascotas")}
   end
 

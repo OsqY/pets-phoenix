@@ -8,182 +8,210 @@ defmodule PetsWeb.MascotaLive.Index do
   def render(assigns) do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
-      <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <.header>
-          <.icon name="hero-heart" class="w-8 h-8 mr-2 text-pink-500" /> Nuestras Mascotas
+          Mascotas
           <:actions>
-            <.button
-              variant="primary"
-              navigate={~p"/mascotas/crear"}
-            >
-              <.icon name="hero-plus" class="w-5 h-5 mr-1" /> Nueva Mascota
+            <.button variant="primary" navigate={~p"/mascotas/crear"}>
+              Nueva Mascota
             </.button>
           </:actions>
         </.header>
-
-        <form phx-change="search" phx-debounce="300">
-          <div class="mb-8 p-6 rounded-xl border border-slate-700">
-            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-              <div class="flex-1 w-full">
-                <label for="search" class="sr-only">Buscar mascotas</label>
-                <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <.icon name="hero-magnifying-glass" class="h-5 w-5 text-gray-500" />
-                  </div>
-                  <input
-                    type="text"
-                    name="query"
-                    id="query"
-                    value={@query}
-                    class="block w-full pl-10 pr-3 py-2 border border-slate-600 rounded-lg text-gray-200 placeholder-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                    placeholder="Buscar por nombre, especie..."
-                  />
-                </div>
-              </div>
-            </div>
+        
+    <!-- Barra de búsqueda -->
+        <form phx-change="search" phx-debounce="300" class="mt-6">
+          <div class="relative">
+            <input
+              type="text"
+              name="query"
+              id="query"
+              value={@query}
+              class="block w-full pl-4 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 focus:border-transparent"
+              placeholder="Buscar mascotas..."
+            />
           </div>
         </form>
-
-        <div class="grid grid-cols-1 gap-6">
-          <div
-            :for={{id, mascota} <- @streams.mascotas}
-            id={id}
-            class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg dark:shadow-2xl border border-zinc-200 dark:border-slate-700 overflow-hidden"
-            phx-click={JS.navigate(~p"/mascotas/#{mascota}")}
-          >
-            <div class="h-48 rounded-t-2xl flex items-center justify-center relative overflow-hidden">
-              <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              </div>
-              <.icon
-                name="hero-photo"
-                class="w-16 h-16 text-slate-600 group-hover:text-purple-400 transition-colors duration-300"
-              />
-              <div class="absolute top-4 right-4">
-                <span class={[
-                  "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold",
-                  mascota.sexo == "Macho" && "bg-blue-500/20 text-blue-300",
-                  mascota.sexo == "Hembra" && "bg-pink-500/20 text-pink-300",
-                  "late-700 text-slate-300"
-                ]}>
-                  <.icon
-                    name={(mascota.sexo == "Macho" && "hero-sparkles") || "hero-heart"}
-                    class="w-3 h-3 mr-1"
+        
+    <!-- Grid de mascotas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6">
+          <div :for={{id, mascota} <- @streams.mascotas} id={id}>
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+              <!-- Imagen -->
+              <div
+                class="relative aspect-square bg-gray-100 dark:bg-gray-800 cursor-pointer"
+                phx-click="navigate"
+                phx-value-id={mascota.id}
+              >
+                <%= if mascota.imagenes && length(mascota.imagenes) > 0 do %>
+                  <img
+                    src={List.first(mascota.imagenes).url || "/placeholder.svg"}
+                    alt={mascota.nombre}
+                    class="w-full h-full object-cover"
                   />
-                  {mascota.sexo}
-                </span>
+                  <%= if length(mascota.imagenes) > 1 do %>
+                    <div class="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                      {length(mascota.imagenes)}
+                    </div>
+                  <% end %>
+                <% else %>
+                  <div class="w-full h-full flex items-center justify-center">
+                    <div class="w-12 h-12 text-gray-300 dark:text-gray-700">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                <% end %>
+                <!-- Badges simples -->
+                <div class="absolute top-2 left-2 flex flex-col gap-1">
+                  <span class={[
+                    "text-xs px-2 py-0.5 rounded font-medium",
+                    estado_badge_class(mascota.estado)
+                  ]}>
+                    {Mascota.humanize_estado(mascota.estado)}
+                  </span>
+                </div>
               </div>
-            </div>
-
-            <div class="p-5">
-              <div class="flex justify-between items-start mb-3">
-                <h3 class="text-xl font-bold text-gray-100 truncate group-hover:text-purple-400 transition-colors duration-300">
-                  {mascota.nombre}
-                </h3>
-                <div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <.link
-                    navigate={~p"/mascotas/#{mascota}/editar"}
-                    class="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/50 rounded-lg transition-colors duration-200"
-                    phx-click="ignore"
+              <!-- Info -->
+              <div class="p-4">
+                <div class="flex items-start justify-between mb-2">
+                  <h3
+                    class="text-base font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:underline"
+                    phx-click="navigate"
+                    phx-value-id={mascota.id}
                   >
-                    <.icon name="hero-pencil-square" class="w-4 h-4" />
-                  </.link>
-                  <.link
-                    phx-click={JS.push("delete", value: %{id: mascota.id}) |> hide("##{id}")}
-                    data-confirm="¿Estás seguro de que quieres eliminar esta mascota?"
-                    class="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/50 rounded-lg transition-colors duration-200"
-                    phx-click="ignore"
-                  >
-                    <.icon name="hero-trash" class="w-4 h-4" />
-                  </.link>
+                    {mascota.nombre}
+                  </h3>
+                  <div class="flex gap-1 ml-2">
+                    <button
+                      type="button"
+                      phx-click="edit"
+                      phx-value-id={mascota.id}
+                      class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                      title="Editar"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-4 h-4"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      phx-click="delete"
+                      phx-value-id={mascota.id}
+                      data-confirm="¿Estás seguro?"
+                      class="text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+                      title="Eliminar"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-4 h-4"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <p class="text-gray-400 text-sm mb-4 line-clamp-2 leading-relaxed">
-                {mascota.descripcion || "Sin descripción disponible"}
-              </p>
-
-              <div class="grid grid-cols-2 gap-3 text-sm text-gray-300 mb-4">
-                <div class="flex items-center late-700 rounded-lg p-2">
-                  <.icon name="hero-cake" class="w-4 h-4 mr-2 text-purple-400" />
-                  <span class="font-medium">{mascota.edad} años</span>
-                </div>
-                <div class="flex items-center late-700 rounded-lg p-2">
-                  <.icon name="hero-arrows-pointing-out" class="w-4 h-4 mr-2 text-blue-400" />
-                  <span class="font-medium">{mascota.tamanio}</span>
-                </div>
-                <div class="flex items-center late-700 rounded-lg p-2">
-                  <.icon name="hero-scale" class="w-4 h-4 mr-2 text-green-400" />
-                  <span class="font-medium">{mascota.peso} kg</span>
-                </div>
-                <div class="flex items-center late-700 rounded-lg p-2">
-                  <.icon name="hero-paint-brush" class="w-4 h-4 mr-2 text-orange-400" />
-                  <span class="font-medium">{mascota.color.nombre}</span>
+                <div class="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                  {mascota.descripcion || "Sin descripción"}
                 </div>
 
-                <div class="flex items-center late-700 rounded-lg p-2">
-                  <.icon name="hero-home" class="w-4 h-4 mr-2 text-cyan-400" />
-                  <span class="font-medium">{Mascota.humanize_estado(mascota.estado)}</span>
+                <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-500 mb-2">
+                  <span>{mascota.especie.nombre}</span>
+                  <span>·</span>
+                  <span>{mascota.raza.nombre}</span>
                 </div>
-                <div class="flex items-center late-700 rounded-lg p-2">
-                  <.icon name="hero-bolt" class="w-4 h-4 mr-2 text-yellow-400" />
-                  <span class="font-medium">{Mascota.humanize_energia(mascota.energia)}</span>
-                </div>
-              </div>
 
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                  <.icon name="hero-tag" class="w-3 h-3 mr-1" /> Especie: {mascota.especie.nombre}
-                </span>
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-500/20 text-green-300 border border-green-500/30">
-                  <.icon name="hero-arrows-pointing-out" class="w-3 h-3 mr-1" />
-                  Raza: {mascota.raza.nombre}
-                </span>
-              </div>
-
-              <div class="flex justify-between items-center text-xs text-gray-500 border-t border-slate-700 pt-3">
-                <div class="flex items-center">
-                  <.icon name="hero-user-circle" class="w-4 h-4 mr-1 text-gray-600" />
-                  <span>Usuario: {mascota.usuario.email}</span>
-                </div>
-                <div class="text-gray-600">
-                  ID: #{mascota.id}
+                <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-500">
+                  <div class="flex items-center gap-3">
+                    <span>{mascota.edad} años</span>
+                    <span>{mascota.peso} kg</span>
+                  </div>
+                  <span>{mascota.sexo}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
+        
+    <!-- Estado vacío -->
         <div
           :if={map_size(@streams.mascotas) == 0}
-          class="text-center py-16 late-800 rounded-2xl border-2 border-dashed border-slate-700"
+          class="text-center py-16 mt-8"
         >
-          <.icon name="hero-inbox" class="w-20 h-20 text-slate-600 mx-auto mb-6" />
-          <h3 class="text-2xl font-bold text-gray-100 mb-3">¡Aún no hay mascotas!</h3>
-          <p class="text-gray-400 mb-6 max-w-md mx-auto leading-relaxed">
-            Comienza creando el perfil de tu primera mascota. Comparte su historia y ayuda a encontrarle un hogar amoroso.
+          <div class="text-gray-400 dark:text-gray-600 mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-16 h-16 mx-auto"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+              />
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+            {if @query != "", do: "No se encontraron mascotas", else: "No hay mascotas"}
+          </h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            {if @query != "", do: "Intenta con otros términos", else: "Crea tu primera mascota"}
           </p>
-          <.button
-            variant="primary"
-            navigate={~p"/mascotas/crear"}
-            class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            <.icon name="hero-plus" class="w-5 h-5 mr-2" /> Agregar primera mascota
+          <.button variant="primary" navigate={~p"/mascotas/crear"}>
+            Nueva Mascota
           </.button>
         </div>
-
-        <div class="mt-8 text-center">
-          <div class="inline-flex items-center px-4 py-2 late-800 rounded-full shadow-sm border border-slate-700">
-            <.icon name="hero-heart" class="w-5 h-5 mr-2 text-pink-500" />
-            <span class="text-sm font-medium text-gray-300">
-              Mostrando <span class="font-bold text-purple-400">{map_size(@streams.mascotas)}</span>
-              mascotas
-            </span>
-          </div>
+        
+    <!-- Contador -->
+        <div :if={map_size(@streams.mascotas) > 0} class="mt-6 text-center">
+          <span class="text-sm text-gray-500 dark:text-gray-400">
+            {map_size(@streams.mascotas)}
+            {if map_size(@streams.mascotas) == 1, do: "mascota", else: "mascotas"}
+          </span>
         </div>
       </div>
     </Layouts.app>
     """
   end
+
+  defp estado_badge_class(:EnAdopcion), do: "bg-green-500 text-white"
+  defp estado_badge_class(:ConHogar), do: "bg-blue-500 text-white"
+  defp estado_badge_class(:Adoptado), do: "bg-gray-500 text-white"
+  defp estado_badge_class(:EnProcesoAdopcion), do: "bg-yellow-500 text-white"
+  defp estado_badge_class(_), do: "bg-gray-400 text-white"
 
   @impl true
   def mount(_params, _session, socket) do
@@ -199,11 +227,36 @@ defmodule PetsWeb.MascotaLive.Index do
   end
 
   @impl true
+  def handle_event("navigate", %{"id" => id}, socket) do
+    {:noreply, push_navigate(socket, to: ~p"/mascotas/#{id}")}
+  end
+
+  @impl true
+  def handle_event("edit", %{"id" => id}, socket) do
+    {:noreply, push_navigate(socket, to: ~p"/mascotas/#{id}/editar")}
+  end
+
+  @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     mascota = Mascotas.get_mascota!(socket.assigns.current_scope, id)
     {:ok, _} = Mascotas.delete_mascota(socket.assigns.current_scope, mascota)
 
     {:noreply, stream_delete(socket, :mascotas, mascota)}
+  end
+
+  @impl true
+  def handle_event("search", %{"query" => query}, socket) do
+    mascotas = Mascotas.list_mascotas(socket.assigns.current_scope, query)
+
+    {:noreply,
+     socket
+     |> assign(:query, query)
+     |> stream(:mascotas, mascotas, reset: true)}
+  end
+
+  @impl true
+  def handle_event("search", %{"_target" => _}, socket) do
+    {:noreply, socket}
   end
 
   @impl true
@@ -213,23 +266,7 @@ defmodule PetsWeb.MascotaLive.Index do
      stream(socket, :mascotas, list_mascotas(socket.assigns.current_scope), reset: true)}
   end
 
-  defp list_mascotas(current_scope) do
-    Mascotas.list_mascotas()
-  end
-
-  @impl true
-  def handle_event("search", params, socket) do
-    query = Map.get(params, "query", "")
-
-    mascotas = Mascotas.list_mascotas(socket.assigns.current_scope, query)
-
-    socket = stream(socket, :mascotas, mascotas, reset: true)
-
-    {:noreply, assign(socket, query: query)}
-  end
-
-  @impl true
-  def handle_event("search", %{"_target" => ["_target_action"]}, socket) do
-    {:noreply, socket}
+  defp list_mascotas(current_scope, query \\ "") do
+    Mascotas.list_mascotas(current_scope, query)
   end
 end

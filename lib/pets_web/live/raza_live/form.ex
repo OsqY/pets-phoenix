@@ -70,7 +70,7 @@ defmodule PetsWeb.RazaLive.Form do
       {:ok, raza} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Raza updated successfully")
+         |> put_flash(:info, "Raza actualizada correctamente")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, raza)
          )}
@@ -85,7 +85,7 @@ defmodule PetsWeb.RazaLive.Form do
       {:ok, raza} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Raza created successfully")
+         |> put_flash(:info, "Raza creada correctamente")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, raza)
          )}

@@ -22,7 +22,11 @@ config :pets, :scopes,
 
 config :pets,
   ecto_repos: [Pets.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime],
+  access_key_id: System.fetch_env!("AWS_ACCESS_KEY_ID"),
+  secret_access_key: System.fetch_env!("AWS_SECRET_ACCESS_KEY"),
+  bucket: System.fetch_env!("S3_BUCKET_NAME"),
+  region: System.fetch_env!("AWS_REGION")
 
 # Configures the endpoint
 config :pets, PetsWeb.Endpoint,
@@ -72,6 +76,10 @@ config :logger, :default_formatter,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+# Configure Gettext to use Spanish as default locale
+config :gettext, :default_locale, "es"
+config :pets, PetsWeb.Gettext, default_locale: "es"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -54,7 +54,7 @@ defmodule PetsWeb.ColorLive.Show do
       ) do
     {:noreply,
      socket
-     |> put_flash(:error, "The current color was deleted.")
+     |> put_flash(:error, "El color fue eliminado.")
      |> push_navigate(to: ~p"/colores")}
   end
 

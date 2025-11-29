@@ -224,7 +224,7 @@ defmodule PetsWeb.UsuarioAuth do
       socket =
         socket
         |> Phoenix.LiveView.put_flash(:error, "Debe iniciar sesión para acceder a esta página.")
-        |> Phoenix.LiveView.redirect(to: ~p"/usuario/log-in")
+        |> Phoenix.LiveView.redirect(to: ~p"/usuario/iniciar-sesion")
 
       {:halt, socket}
     end
@@ -274,7 +274,7 @@ defmodule PetsWeb.UsuarioAuth do
       socket =
         socket
         |> Phoenix.LiveView.put_flash(:error, "Debe reautentircarse para acceder a esta página.")
-        |> Phoenix.LiveView.redirect(to: ~p"/usuario/log-in")
+        |> Phoenix.LiveView.redirect(to: ~p"/usuario/iniciar-sesion")
 
       {:halt, socket}
     end
@@ -294,7 +294,7 @@ defmodule PetsWeb.UsuarioAuth do
   @doc "Returns the path to redirect to after log in."
   # the usuario was already logged in, redirect to settings
   def signed_in_path(%Plug.Conn{assigns: %{current_scope: %Scope{usuario: %Cuentas.Usuario{}}}}) do
-    ~p"/usuario/settings"
+    ~p"/usuario/configuracion"
   end
 
   def signed_in_path(_), do: ~p"/"
@@ -309,7 +309,7 @@ defmodule PetsWeb.UsuarioAuth do
       conn
       |> put_flash(:error, "Debe iniciar sesión para acceder a esta página.")
       |> maybe_store_return_to()
-      |> redirect(to: ~p"/usuario/log-in")
+      |> redirect(to: ~p"/usuario/iniciar-sesion")
       |> halt()
     end
   end

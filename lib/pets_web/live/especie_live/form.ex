@@ -78,7 +78,7 @@ defmodule PetsWeb.EspecieLive.Form do
       {:ok, especie} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Especie updated successfully")
+         |> put_flash(:info, "Especie actualizada correctamente")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, especie)
          )}
@@ -93,7 +93,7 @@ defmodule PetsWeb.EspecieLive.Form do
       {:ok, especie} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Especie created successfully")
+         |> put_flash(:info, "Especie creada correctamente")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, especie)
          )}

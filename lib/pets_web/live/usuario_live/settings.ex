@@ -71,13 +71,13 @@ defmodule PetsWeb.UsuarioLive.Settings do
     socket =
       case Cuentas.update_usuario_email(socket.assigns.current_scope.usuario, token) do
         {:ok, _usuario} ->
-          put_flash(socket, :info, "Email changed successfully.")
+          put_flash(socket, :info, "Correo electrónico actualizado correctamente.")
 
         {:error, _} ->
-          put_flash(socket, :error, "Email change link is invalid or it has expired.")
+          put_flash(socket, :error, "El enlace de cambio de correo es inválido o ha expirado.")
       end
 
-    {:ok, push_navigate(socket, to: ~p"/usuario/settings")}
+    {:ok, push_navigate(socket, to: ~p"/usuario/configuracion")}
   end
 
   def mount(_params, _session, socket) do
@@ -118,10 +118,10 @@ defmodule PetsWeb.UsuarioLive.Settings do
         Cuentas.deliver_usuario_update_email_instructions(
           Ecto.Changeset.apply_action!(changeset, :insert),
           usuario.email,
-          &url(~p"/usuario/settings/confirm-email/#{&1}")
+          &url(~p"/usuario/configuracion/confirmar-email/#{&1}")
         )
 
-        info = "A link to confirm your email change has been sent to the new address."
+        info = "Se ha enviado un enlace de confirmación a la nueva dirección de correo."
         {:noreply, socket |> put_flash(:info, info)}
 
       changeset ->

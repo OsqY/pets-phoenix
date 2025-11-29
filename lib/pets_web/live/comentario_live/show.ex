@@ -55,7 +55,7 @@ defmodule PetsWeb.ComentarioLive.Show do
       ) do
     {:noreply,
      socket
-     |> put_flash(:error, "The current comentario was deleted.")
+     |> put_flash(:error, "El comentario actual fue eliminado.")
      |> push_navigate(to: ~p"/comentarios")}
   end
 

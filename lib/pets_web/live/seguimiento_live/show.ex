@@ -56,7 +56,7 @@ defmodule PetsWeb.SeguimientoLive.Show do
       ) do
     {:noreply,
      socket
-     |> put_flash(:error, "The current seguimiento was deleted.")
+     |> put_flash(:error, "El seguimiento fue eliminado.")
      |> push_navigate(to: ~p"/seguimientos")}
   end
 

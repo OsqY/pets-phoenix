@@ -87,7 +87,7 @@ defmodule PetsWeb.ImagenMascotaLive.Form do
       {:ok, imagen_mascota} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Imagen mascota updated successfully")
+         |> put_flash(:info, "Imagen de mascota actualizada correctamente")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, imagen_mascota)
          )}
@@ -102,7 +102,7 @@ defmodule PetsWeb.ImagenMascotaLive.Form do
       {:ok, imagen_mascota} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Imagen mascota created successfully")
+         |> put_flash(:info, "Imagen de mascota creada correctamente")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, imagen_mascota)
          )}

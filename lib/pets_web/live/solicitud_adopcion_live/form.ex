@@ -145,7 +145,7 @@ defmodule PetsWeb.SolicitudAdopcionLive.Form do
       {:ok, solicitud_adopcion} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Solicitud adopcion updated successfully")
+         |> put_flash(:info, "Solicitud de adopción actualizada correctamente")
          |> push_navigate(
            to:
              return_path(
@@ -168,7 +168,7 @@ defmodule PetsWeb.SolicitudAdopcionLive.Form do
       {:ok, solicitud_adopcion} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Solicitud adopcion created successfully")
+         |> put_flash(:info, "Solicitud de adopción creada correctamente")
          |> push_navigate(
            to:
              return_path(

@@ -5,11 +5,16 @@ defmodule Pets.Posts do
 
   import Ecto.Query, warn: false
   alias Pets.Repo
+  alias Pets.Chats
 
   alias Pets.Posts.Post
-
   alias Pets.Posts.Comentario
+  alias Pets.Posts.Like
   alias Pets.Cuentas.Scope
+
+  # =============================================================================
+  # PubSub for Comentarios
+  # =============================================================================
 
   @doc """
   Subscribes to scoped notifications about any comentario changes.
@@ -33,6 +38,14 @@ defmodule Pets.Posts do
     Phoenix.PubSub.broadcast(Pets.PubSub, "usuario:#{key}:comentarios", message)
   end
 
+  def subscribe_post_comentarios(post_id) do
+    Phoenix.PubSub.subscribe(Pets.PubSub, "post:#{post_id}:comentarios")
+  end
+
+  defp broadcast_post_comentario(post_id, message) do
+    Phoenix.PubSub.broadcast(Pets.PubSub, "post:#{post_id}:comentarios", message)
+  end
+
   @doc """
   Returns the list of comentarios.
 
@@ -44,6 +57,22 @@ defmodule Pets.Posts do
   """
   def list_comentarios(%Scope{} = scope) do
     Repo.all_by(Comentario, usuario_id: scope.usuario.id)
+  end
+
+  def list_comentarios_for_post(post_id) do
+    usuario_query = from u in Pets.Cuentas.Usuario, select: struct(u, [:id, :email])
+
+    from(c in Comentario,
+      where: c.post_id == ^post_id,
+      order_by: [asc: c.inserted_at],
+      preload: [usuario: ^usuario_query]
+    )
+    |> Repo.all()
+  end
+
+  def count_comentarios_for_post(post_id) do
+    from(c in Comentario, where: c.post_id == ^post_id, select: count(c.id))
+    |> Repo.one()
   end
 
   @doc """
@@ -81,9 +110,28 @@ defmodule Pets.Posts do
            %Comentario{}
            |> Comentario.changeset(attrs, scope)
            |> Repo.insert() do
+      comentario = Repo.preload(comentario, :usuario)
       broadcast_comentario(scope, {:created, comentario})
+      broadcast_post_comentario(comentario.post_id, {:comentario_created, comentario})
+
+      # Notificar al dueño del post (si no es el mismo usuario)
+      post = Repo.get!(Post, comentario.post_id)
+
+      if post.usuario_id != scope.usuario.id do
+        Chats.notificar_comentario_post(
+          post.usuario_id,
+          scope.usuario.email,
+          post.id
+        )
+      end
+
       {:ok, comentario}
     end
+  end
+
+  def create_comentario_for_post(%Scope{} = scope, post_id, attrs) do
+    attrs = Map.put(attrs, "post_id", post_id)
+    create_comentario(scope, attrs)
   end
 
   @doc """
@@ -128,6 +176,7 @@ defmodule Pets.Posts do
     with {:ok, comentario = %Comentario{}} <-
            Repo.delete(comentario) do
       broadcast_comentario(scope, {:deleted, comentario})
+      broadcast_post_comentario(comentario.post_id, {:comentario_deleted, comentario})
       {:ok, comentario}
     end
   end
@@ -147,8 +196,10 @@ defmodule Pets.Posts do
     Comentario.changeset(comentario, attrs, scope)
   end
 
-  alias Pets.Posts.Post
-  alias Pets.Cuentas.Scope
+  def change_new_comentario(%Scope{} = scope, attrs \\ %{}) do
+    %Comentario{usuario_id: scope.usuario.id}
+    |> Comentario.changeset(attrs, scope)
+  end
 
   @doc """
   Subscribes to scoped notifications about any post changes.
@@ -172,6 +223,14 @@ defmodule Pets.Posts do
     Phoenix.PubSub.broadcast(Pets.PubSub, "usuario:#{key}:posts", message)
   end
 
+  def subscribe_post_likes do
+    Phoenix.PubSub.subscribe(Pets.PubSub, "posts:likes")
+  end
+
+  defp broadcast_post_like(message) do
+    Phoenix.PubSub.broadcast(Pets.PubSub, "posts:likes", message)
+  end
+
   @doc """
   Returns the list of posts.
 
@@ -181,11 +240,68 @@ defmodule Pets.Posts do
       [%Post{}, ...]
 
   """
-  def list_posts() do
-    mascota_query = from m in Pets.Mascotas.Mascota, select: struct(m, [:id, :nombre])
+  def list_posts do
+    mascota_query = from m in Pets.Mascotas.Mascota, preload: [:especie]
     usuario_query = from u in Pets.Cuentas.Usuario, select: struct(u, [:id, :email])
-    query = from p in Post, preload: [mascota: ^mascota_query, usuario: ^usuario_query]
+
+    query =
+      from p in Post,
+        order_by: [desc: p.inserted_at],
+        preload: [mascota: ^mascota_query, usuario: ^usuario_query]
+
     Repo.all(query)
+  end
+
+  def list_posts_with_stats(scope) do
+    mascota_query = from m in Pets.Mascotas.Mascota, preload: [:especie]
+    usuario_query = from u in Pets.Cuentas.Usuario, select: struct(u, [:id, :email])
+
+    likes_subquery =
+      from l in Like,
+        group_by: l.post_id,
+        select: %{post_id: l.post_id, count: count(l.id)}
+
+    comentarios_subquery =
+      from c in Comentario,
+        group_by: c.post_id,
+        select: %{post_id: c.post_id, count: count(c.id)}
+
+    posts =
+      from(p in Post,
+        order_by: [desc: p.inserted_at],
+        preload: [mascota: ^mascota_query, usuario: ^usuario_query]
+      )
+      |> Repo.all()
+
+    likes_counts =
+      Repo.all(likes_subquery)
+      |> Map.new(fn %{post_id: id, count: count} -> {id, count} end)
+
+    comentarios_counts =
+      Repo.all(comentarios_subquery)
+      |> Map.new(fn %{post_id: id, count: count} -> {id, count} end)
+
+    user_liked_posts =
+      if scope do
+        from(l in Like,
+          where: l.usuario_id == ^scope.usuario.id,
+          select: l.post_id
+        )
+        |> Repo.all()
+        |> MapSet.new()
+      else
+        MapSet.new()
+      end
+
+    Enum.map(posts, fn post ->
+      %{
+        id: post.id,
+        post: post,
+        likes_count: Map.get(likes_counts, post.id, 0),
+        comentarios_count: Map.get(comentarios_counts, post.id, 0),
+        user_liked: MapSet.member?(user_liked_posts, post.id)
+      }
+    end)
   end
 
   @doc """
@@ -203,7 +319,42 @@ defmodule Pets.Posts do
 
   """
   def get_post!(%Scope{} = scope, id) do
-    Repo.get_by!(Post, id: id, usuario_id: scope.usuario.id)
+    from(p in Post,
+      where: p.id == ^id and p.usuario_id == ^scope.usuario.id
+    )
+    |> Repo.one!()
+  end
+
+  def get_post!(id) do
+    mascota_query = from m in Pets.Mascotas.Mascota, preload: [:especie]
+    usuario_query = from u in Pets.Cuentas.Usuario, select: struct(u, [:id, :email])
+
+    from(p in Post,
+      where: p.id == ^id,
+      preload: [mascota: ^mascota_query, usuario: ^usuario_query]
+    )
+    |> Repo.one!()
+  end
+
+  def get_post_with_stats!(id, scope) do
+    post = get_post!(id)
+    likes_count = count_likes_for_post(id)
+    comentarios_count = count_comentarios_for_post(id)
+
+    user_liked =
+      if scope do
+        user_liked_post?(scope, id)
+      else
+        false
+      end
+
+    %{
+      id: id,
+      post: post,
+      likes_count: likes_count,
+      comentarios_count: comentarios_count,
+      user_liked: user_liked
+    }
   end
 
   @doc """
@@ -287,5 +438,67 @@ defmodule Pets.Posts do
     true = post.usuario_id == scope.usuario.id
 
     Post.changeset(post, attrs, scope)
+  end
+
+  def toggle_like_post(%Scope{} = scope, post_id) do
+    usuario_id = scope.usuario.id
+
+    case Repo.get_by(Like, usuario_id: usuario_id, post_id: post_id) do
+      nil ->
+        %Like{}
+        |> Like.changeset(%{usuario_id: usuario_id, post_id: post_id})
+        |> Repo.insert()
+        |> case do
+          {:ok, _like} ->
+            broadcast_post_like({:post_liked, post_id, usuario_id})
+
+            # Notificar al dueño del post (si no es el mismo usuario)
+            post = Repo.get!(Post, post_id)
+
+            if post.usuario_id != usuario_id do
+              Chats.notificar_like_post(
+                post.usuario_id,
+                scope.usuario.email,
+                post_id
+              )
+            end
+
+            {:ok, :liked}
+
+          {:error, changeset} ->
+            {:error, changeset}
+        end
+
+      %Like{} = like ->
+        Repo.delete(like)
+        broadcast_post_like({:post_unliked, post_id, usuario_id})
+        {:ok, :unliked}
+    end
+  end
+
+  def user_liked_post?(%Scope{} = scope, post_id) do
+    usuario_id = scope.usuario.id
+
+    from(l in Like,
+      where: l.usuario_id == ^usuario_id and l.post_id == ^post_id,
+      select: count(l.id)
+    )
+    |> Repo.one()
+    |> Kernel.>(0)
+  end
+
+  def count_likes_for_post(post_id) do
+    from(l in Like, where: l.post_id == ^post_id, select: count(l.id))
+    |> Repo.one()
+  end
+
+  def get_likes_for_post(post_id) do
+    usuario_query = from u in Pets.Cuentas.Usuario, select: struct(u, [:id, :email])
+
+    from(l in Like,
+      where: l.post_id == ^post_id,
+      preload: [usuario: ^usuario_query]
+    )
+    |> Repo.all()
   end
 end

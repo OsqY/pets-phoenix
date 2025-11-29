@@ -53,7 +53,7 @@ defmodule PetsWeb.RazaLive.Show do
       ) do
     {:noreply,
      socket
-     |> put_flash(:error, "The current raza was deleted.")
+     |> put_flash(:error, "La raza fue eliminada.")
      |> push_navigate(to: ~p"/razas")}
   end
 

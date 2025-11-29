@@ -265,7 +265,7 @@ defmodule Pets.Cuentas do
 
   ## Examples
 
-      iex> deliver_usuario_update_email_instructions(usuario, current_email, &url(~p"/usuario/settings/confirm-email/#{&1}"))
+      iex> deliver_usuario_update_email_instructions(usuario, current_email, &url(~p"/usuario/configuracion/confirmar-email/#{&1}"))
       {:ok, %{to: ..., body: ...}}
 
   """

@@ -64,8 +64,8 @@ defmodule PetsWeb.Router do
         },
         {PetsWeb.UsuarioAuth, :require_authenticated}
       ] do
-      live "/usuario/settings", UsuarioLive.Settings, :edit
-      live "/usuario/settings/confirm-email/:token", UsuarioLive.Settings, :confirm_email
+      live "/usuario/configuracion", UsuarioLive.Settings, :edit
+      live "/usuario/configuracion/confirmar-email/:token", UsuarioLive.Settings, :confirm_email
       live "/posts/crear", PostLive.Form, :new
       live "/posts/:id/editar", PostLive.Form, :edit
       live "/comentarios/crear", ComentarioLive.Form, :new
@@ -81,9 +81,10 @@ defmodule PetsWeb.Router do
       live "/solicitudes-adopcion/:id/seguimientos/:id/editar", SeguimientoLive.Form, :edit
       live "/solicitudes-adopcion/:id/seguimientos/:id", SeguimientoLive.Index, :show
       live "/chat", ChatLive, :index
+      live "/notificaciones", NotificacionLive.Index, :index
     end
 
-    post "/usuario/update-password", UsuarioSessionController, :update_password
+    post "/usuario/actualizar-contrasena", UsuarioSessionController, :update_password
   end
 
   scope "/", PetsWeb do
@@ -128,6 +129,10 @@ defmodule PetsWeb.Router do
       live "/refugio/donacion-inventario/crear", DonacionInventarioLive.Form, :new
       live "/refugio/donacion-inventario/:id/editar", DonacionInventarioLive.Form, :edit
       live "/refugio/donacion-inventario/:id", DonacionInventarioLive.Show, :show
+      live "/historial-medico", HistorialMedicoLive.Index, :index
+      live "/historial-medico/nuevo", HistorialMedicoLive.Form, :new
+      live "/historial-medico/:id", HistorialMedicoLive.Show, :show
+      live "/historial-medico/:id/editar", HistorialMedicoLive.Form, :edit
     end
   end
 
@@ -136,9 +141,9 @@ defmodule PetsWeb.Router do
 
     live_session :current_usuario,
       on_mount: [{PetsWeb.UsuarioAuth, :mount_current_scope}] do
-      live "/usuario/register", UsuarioLive.Registration, :new
-      live "/usuario/log-in", UsuarioLive.Login, :new
-      live "/usuario/log-in/:token", UsuarioLive.Confirmation, :new
+      live "/usuario/registrarse", UsuarioLive.Registration, :new
+      live "/usuario/iniciar-sesion", UsuarioLive.Login, :new
+      live "/usuario/iniciar-sesion/:token", UsuarioLive.Confirmation, :new
       live "/posts", PostLive.Index, :index
       live "/posts/:id", PostLive.Show, :show
       live "/mascotas", MascotaLive.Index, :index, as: :mascota_index
@@ -147,7 +152,7 @@ defmodule PetsWeb.Router do
       live "/comentarios/:id", ComentarioLive.Show, :show
     end
 
-    post "/usuario/log-in", UsuarioSessionController, :create
-    delete "/usuario/log-out", UsuarioSessionController, :delete
+    post "/usuario/iniciar-sesion", UsuarioSessionController, :create
+    delete "/usuario/cerrar-sesion", UsuarioSessionController, :delete
   end
 end

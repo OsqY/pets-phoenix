@@ -94,7 +94,7 @@ defmodule PetsWeb.ColorLive.Form do
       {:ok, color} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Color updated successfully")
+         |> put_flash(:info, "Color actualizado correctamente")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, color)
          )}
@@ -109,7 +109,7 @@ defmodule PetsWeb.ColorLive.Form do
       {:ok, color} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Color created successfully")
+         |> put_flash(:info, "Color creado correctamente")
          |> push_navigate(
            to: return_path(socket.assigns.current_scope, socket.assigns.return_to, color)
          )}

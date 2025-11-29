@@ -53,7 +53,7 @@ defmodule PetsWeb.EspecieLive.Show do
       ) do
     {:noreply,
      socket
-     |> put_flash(:error, "The current especie was deleted.")
+     |> put_flash(:error, "La especie fue eliminada.")
      |> push_navigate(to: ~p"/especies")}
   end
 

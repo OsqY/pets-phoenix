@@ -14,7 +14,7 @@ defmodule PetsWeb.UsuarioLive.Registration do
             Regístrese para crear una cuenta
             <:subtitle>
               ¿Ya tienes una cuenta?
-              <.link navigate={~p"/usuario/log-in"} class="font-semibold text-brand hover:underline">
+              <.link navigate={~p"/usuario/iniciar-sesion"} class="font-semibold text-brand hover:underline">
                 Inicie Sesión
               </.link>
               en su cuenta ahora
@@ -60,7 +60,7 @@ defmodule PetsWeb.UsuarioLive.Registration do
         {:ok, _} =
           Cuentas.deliver_login_instructions(
             usuario,
-            &url(~p"/usuario/log-in/#{&1}")
+            &url(~p"/usuario/iniciar-sesion/#{&1}")
           )
 
         {:noreply,
@@ -69,7 +69,7 @@ defmodule PetsWeb.UsuarioLive.Registration do
            :info,
            "Un correo fue enviado a #{usuario.email}, por favor acceda a él para confirmar su cuenta."
          )
-         |> push_navigate(to: ~p"/usuario/log-in")}
+         |> push_navigate(to: ~p"/usuario/iniciar-sesion")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title default="Pets" suffix=" · Adopciones">
+    <.live_title default="Patitas en Casa" suffix=" · Adopciones">
       {assigns[:page_title]}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
@@ -37,17 +37,17 @@
           {@current_scope.usuario.email}
         </li>
         <li>
-          <.link href={~p"/usuario/settings"}>Configuración</.link>
+          <.link href={~p"/usuario/configuracion"}>Configuración</.link>
         </li>
         <li>
-          <.link href={~p"/usuario/log-out"} method="delete">Salir</.link>
+          <.link href={~p"/usuario/cerrar-sesion"} method="delete">Salir</.link>
         </li>
       <% else %>
         <li>
-          <.link href={~p"/usuario/register"}>Registrarse</.link>
+          <.link href={~p"/usuario/registrarse"}>Registrarse</.link>
         </li>
         <li>
-          <.link href={~p"/usuario/log-in"}>Iniciar Sesión</.link>
+          <.link href={~p"/usuario/iniciar-sesion"}>Iniciar Sesión</.link>
         </li>
       <% end %>
     </ul>

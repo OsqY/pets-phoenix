@@ -522,6 +522,24 @@ defmodule Pets.Mascotas do
     Repo.get_by(Mascota, id: id)
   end
 
+  @doc """
+  Gets a single mascota owned by the user, raising if not found.
+
+  Raises `Ecto.NoResultsError` if the Mascota does not exist or doesn't belong to the user.
+
+  ## Examples
+
+      iex> get_mascota!(scope, 123)
+      %Mascota{}
+
+      iex> get_mascota!(scope, 456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_mascota!(%Scope{} = scope, id) do
+    Repo.get_by!(Mascota, id: id, usuario_id: scope.usuario.id)
+  end
+
   def get_mascota_for_show!(%Scope{} = scope, id) do
     query =
       from m in Mascota,
@@ -810,7 +828,21 @@ defmodule Pets.Mascotas do
 
   """
   def list_historiales_medicos(%Scope{} = scope) do
-    Repo.all_by(HistorialMedico, usuario_id: scope.usuario.id)
+    from(h in HistorialMedico,
+      where: h.usuario_id == ^scope.usuario.id,
+      order_by: [desc: h.fecha],
+      preload: [:mascota]
+    )
+    |> Repo.all()
+  end
+
+  def list_historiales_medicos_for_mascota(mascota_id) do
+    from(h in HistorialMedico,
+      where: h.mascota_id == ^mascota_id,
+      order_by: [desc: h.fecha],
+      preload: [:mascota]
+    )
+    |> Repo.all()
   end
 
   @doc """
@@ -828,7 +860,19 @@ defmodule Pets.Mascotas do
 
   """
   def get_historial_medico!(%Scope{} = scope, id) do
-    Repo.get_by!(HistorialMedico, id: id, usuario_id: scope.usuario.id)
+    from(h in HistorialMedico,
+      where: h.id == ^id and h.usuario_id == ^scope.usuario.id,
+      preload: [:mascota]
+    )
+    |> Repo.one!()
+  end
+
+  def get_historial_medico!(id) do
+    from(h in HistorialMedico,
+      where: h.id == ^id,
+      preload: [:mascota]
+    )
+    |> Repo.one!()
   end
 
   @doc """
@@ -913,8 +957,15 @@ defmodule Pets.Mascotas do
         %HistorialMedico{} = historial_medico,
         attrs \\ %{}
       ) do
-    true = historial_medico.usuario_id == scope.usuario.id
+    if historial_medico.usuario_id do
+      true = historial_medico.usuario_id == scope.usuario.id
+    end
 
     HistorialMedico.changeset(historial_medico, attrs, scope)
+  end
+
+  def change_new_historial_medico(%Scope{} = scope, attrs \\ %{}) do
+    %HistorialMedico{usuario_id: scope.usuario.id}
+    |> HistorialMedico.changeset(attrs, scope)
   end
 end

@@ -16,7 +16,7 @@ defmodule PetsWeb.UsuarioLive.Login do
                 Tienes que reautenticarte para hacer acciones sensibles en tu cuenta.
               <% else %>
                 ¿No tienes una cuenta? <.link
-                  navigate={~p"/usuario/register"}
+                  navigate={~p"/usuario/registrarse"}
                   class="font-semibold text-brand hover:underline"
                   phx-no-format
                 >Cree una cuenta</.link> ahora.
@@ -39,7 +39,7 @@ defmodule PetsWeb.UsuarioLive.Login do
           :let={f}
           for={@form}
           id="login_form_magic"
-          action={~p"/usuario/log-in"}
+          action={~p"/usuario/iniciar-sesion"}
           phx-submit="submit_magic"
         >
           <.input
@@ -62,7 +62,7 @@ defmodule PetsWeb.UsuarioLive.Login do
           :let={f}
           for={@form}
           id="login_form_password"
-          action={~p"/usuario/log-in"}
+          action={~p"/usuario/iniciar-sesion"}
           phx-submit="submit_password"
           phx-trigger-action={@trigger_submit}
         >
@@ -112,7 +112,7 @@ defmodule PetsWeb.UsuarioLive.Login do
     if usuario = Cuentas.get_usuario_by_email(email) do
       Cuentas.deliver_login_instructions(
         usuario,
-        &url(~p"/usuario/log-in/#{&1}")
+        &url(~p"/usuario/iniciar-sesion/#{&1}")
       )
     end
 
@@ -122,7 +122,7 @@ defmodule PetsWeb.UsuarioLive.Login do
     {:noreply,
      socket
      |> put_flash(:info, info)
-     |> push_navigate(to: ~p"/usuario/log-in")}
+     |> push_navigate(to: ~p"/usuario/iniciar-sesion")}
   end
 
   defp local_mail_adapter? do

@@ -46,7 +46,7 @@ defmodule Pets.Cuentas.Usuario do
       changeset
       |> validate_required([:email])
       |> validate_format(:email, ~r/^[^@,;\s]+@[^@,;\s]+$/,
-        message: "must have the @ sign and no spaces"
+        message: "debe tener el símbolo @ y no contener espacios"
       )
       |> validate_length(:email, max: 160)
 
@@ -62,7 +62,7 @@ defmodule Pets.Cuentas.Usuario do
 
   defp validate_email_changed(changeset) do
     if get_field(changeset, :email) && get_change(changeset, :email) == nil do
-      add_error(changeset, :email, "did not change")
+      add_error(changeset, :email, "no ha cambiado")
     else
       changeset
     end
@@ -86,7 +86,7 @@ defmodule Pets.Cuentas.Usuario do
   def password_(usuario, attrs, opts \\ []) do
     usuario
     |> cast(attrs, [:password])
-    |> validate_confirmation(:password, message: "does not match password")
+    |> validate_confirmation(:password, message: "las contraseñas no coinciden")
     |> validate_password(opts)
   end
 

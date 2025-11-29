@@ -7,6 +7,7 @@ defmodule Pets.Adopciones do
   alias Pets.Cuentas.Usuario
   alias Pets.Mascotas.Mascota
   alias Pets.Repo
+  alias Pets.Chats
 
   alias Pets.Adopciones.SolicitudAdopcion
   alias Pets.Cuentas.Scope
@@ -114,6 +115,17 @@ defmodule Pets.Adopciones do
            |> SolicitudAdopcion.changeset(attrs, scope)
            |> Repo.insert() do
       broadcast_solicitud_adopcion(scope, {:created, solicitud_adopcion})
+
+      # Notificar al refugio sobre la nueva solicitud
+      solicitud_con_mascota = Repo.preload(solicitud_adopcion, :mascota)
+      mascota_nombre = solicitud_con_mascota.mascota.nombre
+
+      Chats.notificar_solicitud_adopcion(
+        solicitud_adopcion.refugio_id,
+        mascota_nombre,
+        solicitud_adopcion.id
+      )
+
       {:ok, solicitud_adopcion}
     end
   end
@@ -135,14 +147,33 @@ defmodule Pets.Adopciones do
         %SolicitudAdopcion{} = solicitud_adopcion,
         attrs
       ) do
-    true = solicitud_adopcion.adoptante_id == scope.usuario.id
+    true =
+      solicitud_adopcion.adoptante_id == scope.usuario.id or
+        solicitud_adopcion.refugio_id == scope.usuario.id
 
-    with {:ok, solicitud_adopcion = %SolicitudAdopcion{}} <-
+    estado_anterior = solicitud_adopcion.estado
+
+    with {:ok, solicitud_actualizada = %SolicitudAdopcion{}} <-
            solicitud_adopcion
            |> SolicitudAdopcion.changeset(attrs, scope)
            |> Repo.update() do
-      broadcast_solicitud_adopcion(scope, {:updated, solicitud_adopcion})
-      {:ok, solicitud_adopcion}
+      broadcast_solicitud_adopcion(scope, {:updated, solicitud_actualizada})
+
+      # Notificar al adoptante si el estado cambió (acción del refugio)
+      if solicitud_actualizada.estado != estado_anterior and
+           scope.usuario.id == solicitud_adopcion.refugio_id do
+        solicitud_con_mascota = Repo.preload(solicitud_actualizada, :mascota)
+        mascota_nombre = solicitud_con_mascota.mascota.nombre
+
+        Chats.notificar_cambio_estado_solicitud(
+          solicitud_actualizada.adoptante_id,
+          mascota_nombre,
+          solicitud_actualizada.estado,
+          solicitud_actualizada.id
+        )
+      end
+
+      {:ok, solicitud_actualizada}
     end
   end
 

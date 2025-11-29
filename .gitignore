@@ -35,3 +35,77 @@ pets-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Database files (SQLite)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Elixir Language Server
+.elixir_ls/
+.lexical/
+
+# Local configuration files
+/config/*.secret.exs
+/config/dev.secret.exs
+/config/prod.secret.exs
+/config/test.secret.exs
+
+# Generated on deploy
+/priv/static/
+
+# Ignore uploaded files in development
+/priv/static/uploads/
+/uploads/
+
+# Log files
+*.log
+/log/
+
+# Test artifacts
+/test/support/fixtures/files/tmp/
+
+# Dialyzer
+/priv/plts/
+.dialyzer/
+
+# Credo
+.credo.exs
+
+# Release artifacts
+/rel/artifacts/
+/_build/prod/rel/
+
+# Mnesia files
+Mnesia.*/
+
+# Phoenix live reload
+.phoenix_live_reload_pid
+
+# Benchmark results
+/benchmarks/results/
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Windows
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
