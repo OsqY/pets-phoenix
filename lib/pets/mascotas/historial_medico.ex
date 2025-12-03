@@ -25,5 +25,6 @@ defmodule Pets.Mascotas.HistorialMedico do
     |> validate_inclusion(:tipo, @tipos)
     |> put_change(:usuario_id, usuario_scope.usuario.id)
     |> foreign_key_constraint(:mascota_id)
+    |> foreign_key_constraint(:usuario_id)
   end
 end

@@ -469,4 +469,57 @@ defmodule PetsWeb.CoreComponents do
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
+
+  @doc """
+  Formatea un número como moneda en Lempiras hondureños.
+
+  ## Ejemplos
+
+      iex> format_lempiras(1500)
+      "L 1,500.00"
+
+      iex> format_lempiras(1500.5)
+      "L 1,500.50"
+
+      iex> format_lempiras(nil)
+      "L 0.00"
+  """
+  def format_lempiras(nil), do: "L 0.00"
+
+  def format_lempiras(amount) when is_number(amount) do
+    formatted =
+      amount
+      |> Decimal.from_float()
+      |> Decimal.round(2)
+      |> Decimal.to_string()
+      |> format_with_commas()
+
+    "L #{formatted}"
+  end
+
+  def format_lempiras(%Decimal{} = amount) do
+    formatted =
+      amount
+      |> Decimal.round(2)
+      |> Decimal.to_string()
+      |> format_with_commas()
+
+    "L #{formatted}"
+  end
+
+  defp format_with_commas(number_string) do
+    [integer_part | decimal_parts] = String.split(number_string, ".")
+    decimal_part = List.first(decimal_parts) || "00"
+    decimal_part = String.pad_trailing(decimal_part, 2, "0")
+
+    formatted_integer =
+      integer_part
+      |> String.reverse()
+      |> String.graphemes()
+      |> Enum.chunk_every(3)
+      |> Enum.join(",")
+      |> String.reverse()
+
+    "#{formatted_integer}.#{decimal_part}"
+  end
 end

@@ -17,15 +17,9 @@ defmodule PetsWeb.DonacionInventarioLive.Form do
 
       <.form for={@form} id="donacion_inventario-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:cantidad]} type="number" label="Cantidad" step="any" />
-        <.input field={@form[:descripcion]} type="text" label="Descripcion" />
+        <.input field={@form[:descripcion]} type="text" label="Descripción" />
         <.input field={@form[:fecha]} type="date" label="Fecha" />
-        <.input
-          field={@form[:donantes]}
-          type="select"
-          multiple
-          label="Donantes"
-          options={[{"Option 1", "option1"}, {"Option 2", "option2"}]}
-        />
+        <.input field={@form[:donante]} type="text" label="Donante" placeholder="Nombre del donante (opcional)" />
         <.input
           field={@form[:medida]}
           type="select"
@@ -43,7 +37,7 @@ defmodule PetsWeb.DonacionInventarioLive.Form do
         <footer>
           <.button phx-disable-with="Guardando..." variant="primary">Guardar</.button>
           <.button navigate={return_path(@current_scope, @return_to, @donacion_inventario)}>
-            Cancel
+            Cancelar
           </.button>
         </footer>
       </.form>
@@ -66,7 +60,7 @@ defmodule PetsWeb.DonacionInventarioLive.Form do
     donacion_inventario = Refugios.get_donacion_inventario!(socket.assigns.current_scope, id)
 
     socket
-    |> assign(:page_title, "Edit Donacion inventario")
+    |> assign(:page_title, "Editar Donación")
     |> assign(:donacion_inventario, donacion_inventario)
     |> assign(
       :form,
@@ -80,7 +74,7 @@ defmodule PetsWeb.DonacionInventarioLive.Form do
     donacion_inventario = %DonacionInventario{refugio_id: socket.assigns.current_scope.usuario.id}
 
     socket
-    |> assign(:page_title, "New Donacion inventario")
+    |> assign(:page_title, "Nueva Donación")
     |> assign(:donacion_inventario, donacion_inventario)
     |> assign(
       :form,

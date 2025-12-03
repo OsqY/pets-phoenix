@@ -8,10 +8,10 @@ defmodule PetsWeb.ComentarioLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Listing Comentarios
+        Lista de Comentarios
         <:actions>
           <.button variant="primary" navigate={~p"/comentarios/new"}>
-            <.icon name="hero-plus" /> New Comentario
+            <.icon name="hero-plus" /> Nuevo Comentario
           </.button>
         </:actions>
       </.header>
@@ -26,16 +26,16 @@ defmodule PetsWeb.ComentarioLive.Index do
         <:col :let={{_id, comentario}} label="Likes">{comentario.likes}</:col>
         <:action :let={{_id, comentario}}>
           <div class="sr-only">
-            <.link navigate={~p"/comentarios/#{comentario}"}>Show</.link>
+            <.link navigate={~p"/comentarios/#{comentario}"}>Ver</.link>
           </div>
-          <.link navigate={~p"/comentarios/#{comentario}/edit"}>Edit</.link>
+          <.link navigate={~p"/comentarios/#{comentario}/edit"}>Editar</.link>
         </:action>
         <:action :let={{id, comentario}}>
           <.link
             phx-click={JS.push("delete", value: %{id: comentario.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm="¿Estás seguro?"
           >
-            Delete
+            Eliminar
           </.link>
         </:action>
       </.table>
@@ -51,7 +51,7 @@ defmodule PetsWeb.ComentarioLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Listing Comentarios")
+     |> assign(:page_title, "Lista de Comentarios")
      |> stream(:comentarios, list_comentarios(socket.assigns.current_scope))}
   end
 

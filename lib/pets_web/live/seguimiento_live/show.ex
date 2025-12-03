@@ -8,23 +8,28 @@ defmodule PetsWeb.SeguimientoLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Seguimiento {@seguimiento.id}
-        <:subtitle>This is a seguimiento record from your database.</:subtitle>
+        Seguimiento #{@seguimiento.id}
+        <:subtitle>Información del seguimiento registrado.</:subtitle>
         <:actions>
-          <.button navigate={~p"/seguimientos"}>
-            <.icon name="hero-arrow-left" />
+          <.button navigate={~p"/solicitudes-adopcion/#{@seguimiento.solicitud_id}"}>
+            <.icon name="hero-arrow-left" /> Volver a solicitud
           </.button>
-          <.button variant="primary" navigate={~p"/seguimientos/#{@seguimiento}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit seguimiento
-          </.button>
+          <%= if "refugio" in @current_scope.usuario.roles do %>
+            <.button variant="primary" navigate={~p"/seguimientos/#{@seguimiento.id}/editar?return_to=show"}>
+              <.icon name="hero-pencil-square" /> Editar seguimiento
+            </.button>
+          <% end %>
         </:actions>
       </.header>
 
       <.list>
-        <:item title="Fecha">{@seguimiento.fecha}</:item>
+        <:item title="Fecha">{Calendar.strftime(@seguimiento.fecha, "%d/%m/%Y")}</:item>
         <:item title="Notas">{@seguimiento.notas}</:item>
-        <:item title="Solicitud">{@seguimiento.solicitud_id}</:item>
-        <:item title="Responsable">{@seguimiento.responsable_id}</:item>
+        <:item title="Mascota">{@seguimiento.solicitud.mascota.nombre}</:item>
+        <:item title="Adoptante">{@seguimiento.solicitud.adoptante.email}</:item>
+        <:item title="Estado de solicitud">{Pets.Adopciones.SolicitudAdopcion.humanize_estado(@seguimiento.solicitud.estado)}</:item>
+        <:item title="Responsable">{@seguimiento.responsable.email}</:item>
+        <:item title="Registrado el">{Calendar.strftime(@seguimiento.inserted_at, "%d/%m/%Y %H:%M")}</:item>
       </.list>
     </Layouts.app>
     """
@@ -36,10 +41,14 @@ defmodule PetsWeb.SeguimientoLive.Show do
       Adopciones.subscribe_seguimientos(socket.assigns.current_scope)
     end
 
+    seguimiento =
+      Adopciones.get_seguimiento!(socket.assigns.current_scope, id)
+      |> Pets.Repo.preload([:responsable, solicitud: [:mascota, :adoptante]])
+
     {:ok,
      socket
-     |> assign(:page_title, "Show Seguimiento")
-     |> assign(:seguimiento, Adopciones.get_seguimiento!(socket.assigns.current_scope, id))}
+     |> assign(:page_title, "Ver Seguimiento")
+     |> assign(:seguimiento, seguimiento)}
   end
 
   @impl true
@@ -47,6 +56,7 @@ defmodule PetsWeb.SeguimientoLive.Show do
         {:updated, %Pets.Adopciones.Seguimiento{id: id} = seguimiento},
         %{assigns: %{seguimiento: %{id: id}}} = socket
       ) do
+    seguimiento = Pets.Repo.preload(seguimiento, [:responsable, solicitud: [:mascota, :adoptante]])
     {:noreply, assign(socket, :seguimiento, seguimiento)}
   end
 

@@ -8,10 +8,10 @@ defmodule PetsWeb.ImagenMascotaLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Listing Imagenes mascotas
+        Lista de Imágenes de Mascotas
         <:actions>
           <.button variant="primary" navigate={~p"/imagenes_mascotas/new"}>
-            <.icon name="hero-plus" /> New Imagen mascota
+            <.icon name="hero-plus" /> Nueva Imagen
           </.button>
         </:actions>
       </.header>
@@ -25,16 +25,16 @@ defmodule PetsWeb.ImagenMascotaLive.Index do
         <:col :let={{_id, imagen_mascota}} label="Mascota">{imagen_mascota.mascota_id}</:col>
         <:action :let={{_id, imagen_mascota}}>
           <div class="sr-only">
-            <.link navigate={~p"/imagenes_mascotas/#{imagen_mascota}"}>Show</.link>
+            <.link navigate={~p"/imagenes_mascotas/#{imagen_mascota}"}>Ver</.link>
           </div>
-          <.link navigate={~p"/imagenes_mascotas/#{imagen_mascota}/edit"}>Edit</.link>
+          <.link navigate={~p"/imagenes_mascotas/#{imagen_mascota}/edit"}>Editar</.link>
         </:action>
         <:action :let={{id, imagen_mascota}}>
           <.link
             phx-click={JS.push("delete", value: %{id: imagen_mascota.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm="¿Estás seguro?"
           >
-            Delete
+            Eliminar
           </.link>
         </:action>
       </.table>
@@ -50,7 +50,7 @@ defmodule PetsWeb.ImagenMascotaLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Listing Imagenes mascotas")
+     |> assign(:page_title, "Lista de Imágenes de Mascotas")
      |> stream(:imagenes_mascotas, list_imagenes_mascotas(socket.assigns.current_scope))}
   end
 

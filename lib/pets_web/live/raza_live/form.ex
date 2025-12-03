@@ -10,14 +10,14 @@ defmodule PetsWeb.RazaLive.Form do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {@page_title}
-        <:subtitle>Use this form to manage raza records in your database.</:subtitle>
+        <:subtitle>Utiliza este formulario para gestionar las razas.</:subtitle>
       </.header>
 
       <.form for={@form} id="raza-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:nombre]} type="text" label="Nombre" />
         <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Raza</.button>
-          <.button navigate={return_path(@current_scope, @return_to, @raza)}>Cancel</.button>
+          <.button phx-disable-with="Guardando..." variant="primary">Guardar Raza</.button>
+          <.button navigate={return_path(@current_scope, @return_to, @raza)}>Cancelar</.button>
         </footer>
       </.form>
     </Layouts.app>
@@ -39,7 +39,7 @@ defmodule PetsWeb.RazaLive.Form do
     raza = Mascotas.get_raza!(socket.assigns.current_scope, id)
 
     socket
-    |> assign(:page_title, "Edit Raza")
+    |> assign(:page_title, "Editar Raza")
     |> assign(:raza, raza)
     |> assign(:form, to_form(Mascotas.change_raza(socket.assigns.current_scope, raza)))
   end
@@ -48,7 +48,7 @@ defmodule PetsWeb.RazaLive.Form do
     raza = %Raza{usuario_id: socket.assigns.current_scope.usuario.id}
 
     socket
-    |> assign(:page_title, "New Raza")
+    |> assign(:page_title, "Nueva Raza")
     |> assign(:raza, raza)
     |> assign(:form, to_form(Mascotas.change_raza(socket.assigns.current_scope, raza)))
   end

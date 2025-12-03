@@ -10,16 +10,16 @@ defmodule PetsWeb.ImagenMascotaLive.Form do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {@page_title}
-        <:subtitle>Use this form to manage imagen_mascota records in your database.</:subtitle>
+        <:subtitle>Utiliza este formulario para gestionar las imágenes de mascotas.</:subtitle>
       </.header>
 
       <.form for={@form} id="imagen_mascota-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:url]} type="text" label="Url" />
         <.input field={@form[:mascota_id]} type="number" label="Mascota" />
         <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Imagen mascota</.button>
+          <.button phx-disable-with="Guardando..." variant="primary">Guardar Imagen</.button>
           <.button navigate={return_path(@current_scope, @return_to, @imagen_mascota)}>
-            Cancel
+            Cancelar
           </.button>
         </footer>
       </.form>
@@ -42,7 +42,7 @@ defmodule PetsWeb.ImagenMascotaLive.Form do
     imagen_mascota = Mascotas.get_imagen_mascota!(socket.assigns.current_scope, id)
 
     socket
-    |> assign(:page_title, "Edit Imagen mascota")
+    |> assign(:page_title, "Editar Imagen de Mascota")
     |> assign(:imagen_mascota, imagen_mascota)
     |> assign(
       :form,
@@ -54,7 +54,7 @@ defmodule PetsWeb.ImagenMascotaLive.Form do
     imagen_mascota = %ImagenMascota{}
 
     socket
-    |> assign(:page_title, "New Imagen mascota")
+    |> assign(:page_title, "Nueva Imagen de Mascota")
     |> assign(:imagen_mascota, imagen_mascota)
     |> assign(
       :form,

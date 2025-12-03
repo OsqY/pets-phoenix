@@ -10,7 +10,7 @@ defmodule PetsWeb.ColorLive.Form do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {@page_title}
-        <:subtitle>Use this form to manage color records in your database.</:subtitle>
+        <:subtitle>Utiliza este formulario para gestionar los colores.</:subtitle>
       </.header>
 
       <.form for={@form} id="color-form" phx-change="validate" phx-submit="save">

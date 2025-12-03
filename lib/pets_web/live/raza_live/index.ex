@@ -8,10 +8,10 @@ defmodule PetsWeb.RazaLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Listing Razas
+        Lista de Razas
         <:actions>
           <.button variant="primary" navigate={~p"/admin/razas/crear"}>
-            <.icon name="hero-plus" /> New Raza
+            <.icon name="hero-plus" /> Nueva Raza
           </.button>
         </:actions>
       </.header>
@@ -24,16 +24,16 @@ defmodule PetsWeb.RazaLive.Index do
         <:col :let={{_id, raza}} label="Nombre">{raza.nombre}</:col>
         <:action :let={{_id, raza}}>
           <div class="sr-only">
-            <.link navigate={~p"/admin/razas/#{raza}"}>Show</.link>
+            <.link navigate={~p"/admin/razas/#{raza}"}>Ver</.link>
           </div>
-          <.link navigate={~p"/admin/razas/#{raza}/editar"}>Edit</.link>
+          <.link navigate={~p"/admin/razas/#{raza}/editar"}>Editar</.link>
         </:action>
         <:action :let={{id, raza}}>
           <.link
             phx-click={JS.push("delete", value: %{id: raza.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm="¿Estás seguro?"
           >
-            Delete
+            Eliminar
           </.link>
         </:action>
       </.table>
@@ -49,7 +49,7 @@ defmodule PetsWeb.RazaLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Listing Razas")
+     |> assign(:page_title, "Lista de Razas")
      |> stream(:razas, list_razas(socket.assigns.current_scope))}
   end
 

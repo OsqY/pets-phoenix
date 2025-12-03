@@ -6,7 +6,7 @@ defmodule Pets.Refugios.DonacionInventario do
     field :cantidad, :float
     field :descripcion, :string
     field :fecha, :date
-    field :donantes, {:array, :string}
+    field :donante, :string
     field :medida, Ecto.Enum, values: [:unidades, :kg, :litros]
     field :tipo, Ecto.Enum, values: [:comida, :medicina, :utileria]
 
@@ -18,8 +18,8 @@ defmodule Pets.Refugios.DonacionInventario do
   @doc false
   def changeset(donacion_inventario, attrs, usuario_scope) do
     donacion_inventario
-    |> cast(attrs, [:cantidad, :descripcion, :fecha, :donantes, :medida, :tipo])
-    |> validate_required([:cantidad, :descripcion, :fecha, :donantes, :medida, :tipo])
+    |> cast(attrs, [:cantidad, :descripcion, :fecha, :donante, :medida, :tipo])
+    |> validate_required([:cantidad, :descripcion, :fecha, :medida, :tipo])
     |> put_change(:refugio_id, usuario_scope.usuario.id)
   end
 end

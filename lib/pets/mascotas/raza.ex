@@ -18,4 +18,16 @@ defmodule Pets.Mascotas.Raza do
     |> validate_required([:nombre])
     |> put_change(:usuario_id, usuario_scope.usuario.id)
   end
+
+  @doc """
+  Changeset para validar el borrado de una raza.
+  Previene el borrado si tiene mascotas asociadas.
+  """
+  def delete_changeset(raza) do
+    raza
+    |> change()
+    |> no_assoc_constraint(:mascotas,
+      message: "No se puede eliminar esta raza porque tiene mascotas asociadas."
+    )
+  end
 end

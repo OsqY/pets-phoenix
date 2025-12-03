@@ -9,13 +9,13 @@ defmodule PetsWeb.ComentarioLive.Show do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         Comentario {@comentario.id}
-        <:subtitle>This is a comentario record from your database.</:subtitle>
+        <:subtitle>Información del comentario registrado.</:subtitle>
         <:actions>
           <.button navigate={~p"/comentarios"}>
             <.icon name="hero-arrow-left" />
           </.button>
           <.button variant="primary" navigate={~p"/comentarios/#{@comentario}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit comentario
+            <.icon name="hero-pencil-square" /> Editar comentario
           </.button>
         </:actions>
       </.header>
@@ -37,7 +37,7 @@ defmodule PetsWeb.ComentarioLive.Show do
 
     {:ok,
      socket
-     |> assign(:page_title, "Show Comentario")
+     |> assign(:page_title, "Ver Comentario")
      |> assign(:comentario, Posts.get_comentario!(socket.assigns.current_scope, id))}
   end
 

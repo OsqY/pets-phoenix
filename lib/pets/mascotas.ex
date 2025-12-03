@@ -127,7 +127,9 @@ defmodule Pets.Mascotas do
     true = raza.usuario_id == scope.usuario.id
 
     with {:ok, raza = %Raza{}} <-
-           Repo.delete(raza) do
+           raza
+           |> Raza.delete_changeset()
+           |> Repo.delete() do
       broadcast_raza(scope, {:deleted, raza})
       {:ok, raza}
     end
@@ -266,7 +268,9 @@ defmodule Pets.Mascotas do
   """
   def delete_especie(%Scope{} = scope, %Especie{} = especie) do
     with {:ok, especie = %Especie{}} <-
-           Repo.delete(especie) do
+           especie
+           |> Especie.delete_changeset()
+           |> Repo.delete() do
       broadcast_especie(scope, {:deleted, especie})
       {:ok, especie}
     end
@@ -403,7 +407,9 @@ defmodule Pets.Mascotas do
     true = color.usuario_id == scope.usuario.id
 
     with {:ok, color = %Color{}} <-
-           Repo.delete(color) do
+           color
+           |> Color.delete_changeset()
+           |> Repo.delete() do
       broadcast_color(scope, {:deleted, color})
       {:ok, color}
     end
@@ -633,7 +639,9 @@ defmodule Pets.Mascotas do
     true = mascota.usuario_id == scope.usuario.id
 
     with {:ok, mascota = %Mascota{}} <-
-           Repo.delete(mascota) do
+           mascota
+           |> Mascota.delete_changeset()
+           |> Repo.delete() do
       broadcast_mascota(scope, {:deleted, mascota})
       {:ok, mascota}
     end

@@ -106,7 +106,6 @@ defmodule PetsWeb.MascotaLive.Show do
           </div>
 
           <div class="space-y-6">
-            <!-- Estado y Energía - Badges destacados -->
             <div class="flex flex-wrap gap-3">
               <span class={"inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold #{estado_badge_class(@mascota.estado)}"}>
                 <.icon name="hero-heart" class="w-4 h-4" />

@@ -8,14 +8,14 @@ defmodule PetsWeb.ImagenMascotaLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Imagen mascota {@imagen_mascota.id}
-        <:subtitle>This is a imagen_mascota record from your database.</:subtitle>
+        Imagen de Mascota {@imagen_mascota.id}
+        <:subtitle>Información de la imagen registrada.</:subtitle>
         <:actions>
           <.button navigate={~p"/imagenes_mascotas"}>
             <.icon name="hero-arrow-left" />
           </.button>
           <.button variant="primary" navigate={~p"/imagenes_mascotas/#{@imagen_mascota}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit imagen_mascota
+            <.icon name="hero-pencil-square" /> Editar imagen
           </.button>
         </:actions>
       </.header>
@@ -36,7 +36,7 @@ defmodule PetsWeb.ImagenMascotaLive.Show do
 
     {:ok,
      socket
-     |> assign(:page_title, "Show Imagen mascota")
+     |> assign(:page_title, "Ver Imagen de Mascota")
      |> assign(:imagen_mascota, Mascotas.get_imagen_mascota!(socket.assigns.current_scope, id))}
   end
 

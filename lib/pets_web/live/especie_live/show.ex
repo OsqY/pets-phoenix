@@ -9,13 +9,13 @@ defmodule PetsWeb.EspecieLive.Show do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         Especie {@especie.id}
-        <:subtitle>This is a especie record from your database.</:subtitle>
+        <:subtitle>Información de la especie registrada.</:subtitle>
         <:actions>
           <.button navigate={~p"/admin/especies"}>
             <.icon name="hero-arrow-left" />
           </.button>
           <.button variant="primary" navigate={~p"/admin/especies/#{@especie}/editar?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit especie
+            <.icon name="hero-pencil-square" /> Editar especie
           </.button>
         </:actions>
       </.header>
@@ -35,7 +35,7 @@ defmodule PetsWeb.EspecieLive.Show do
 
     {:ok,
      socket
-     |> assign(:page_title, "Show Especie")
+     |> assign(:page_title, "Ver Especie")
      |> assign(:especie, Mascotas.get_especie!(socket.assigns.current_scope, id))}
   end
 

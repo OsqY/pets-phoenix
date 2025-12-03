@@ -11,8 +11,8 @@ defmodule PetsWeb.UsuarioLive.Settings do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="text-center">
         <.header>
-          Account Settings
-          <:subtitle>Manage your account email address and password settings</:subtitle>
+          Configuración de Cuenta
+          <:subtitle>Administra tu correo electrónico y contraseña</:subtitle>
         </.header>
       </div>
 
@@ -24,7 +24,7 @@ defmodule PetsWeb.UsuarioLive.Settings do
           autocomplete="username"
           required
         />
-        <.button variant="primary" phx-disable-with="Changing...">Change Email</.button>
+        <.button variant="primary" phx-disable-with="Cambiando...">Cambiar Correo</.button>
       </.form>
 
       <div class="divider" />
@@ -48,18 +48,18 @@ defmodule PetsWeb.UsuarioLive.Settings do
         <.input
           field={@password_form[:password]}
           type="password"
-          label="New password"
+          label="Nueva contraseña"
           autocomplete="new-password"
           required
         />
         <.input
           field={@password_form[:password_confirmation]}
           type="password"
-          label="Confirm new password"
+          label="Confirmar nueva contraseña"
           autocomplete="new-password"
         />
-        <.button variant="primary" phx-disable-with="Saving...">
-          Save Password
+        <.button variant="primary" phx-disable-with="Guardando...">
+          Guardar Contraseña
         </.button>
       </.form>
     </Layouts.app>

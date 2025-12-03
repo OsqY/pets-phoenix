@@ -9,7 +9,7 @@ defmodule PetsWeb.ColorLive.Show do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         Color {@color.id}
-        <:subtitle>This is a color record from your database.</:subtitle>
+        <:subtitle>Información del color registrado.</:subtitle>
         <:actions>
           <.button navigate={~p"/admin/colores"}>
             <.icon name="hero-arrow-left" />
@@ -36,7 +36,7 @@ defmodule PetsWeb.ColorLive.Show do
 
     {:ok,
      socket
-     |> assign(:page_title, "Show Color")
+     |> assign(:page_title, "Ver Color")
      |> assign(:color, Mascotas.get_color!(socket.assigns.current_scope, id))}
   end
 

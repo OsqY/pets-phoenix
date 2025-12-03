@@ -5,6 +5,7 @@ defmodule Pets.Adopciones.Seguimiento do
   schema "seguimientos" do
     field :fecha, :date
     field :notas, :string
+    field :nuevo_estado, :string, virtual: true
 
     belongs_to :solicitud, Pets.Adopciones.SolicitudAdopcion
     belongs_to :responsable, Pets.Cuentas.Usuario
@@ -16,7 +17,7 @@ defmodule Pets.Adopciones.Seguimiento do
   @doc false
   def changeset(seguimiento, attrs, usuario_scope) do
     seguimiento
-    |> cast(attrs, [:fecha, :notas, :solicitud_id, :responsable_id, :usuario_id])
+    |> cast(attrs, [:fecha, :notas, :solicitud_id, :responsable_id, :usuario_id, :nuevo_estado])
     |> validate_required([:notas])
     |> put_change(:responsable_id, usuario_scope.usuario.id)
   end

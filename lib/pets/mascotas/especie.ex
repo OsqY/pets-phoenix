@@ -17,4 +17,19 @@ defmodule Pets.Mascotas.Especie do
     |> cast(attrs, [:nombre])
     |> validate_required([:nombre])
   end
+
+  @doc """
+  Changeset para validar el borrado de una especie.
+  Previene el borrado si tiene colores o mascotas asociadas.
+  """
+  def delete_changeset(especie) do
+    especie
+    |> change()
+    |> no_assoc_constraint(:colores,
+      message: "No se puede eliminar esta especie porque tiene colores asociados."
+    )
+    |> no_assoc_constraint(:mascotas,
+      message: "No se puede eliminar esta especie porque tiene mascotas asociadas."
+    )
+  end
 end

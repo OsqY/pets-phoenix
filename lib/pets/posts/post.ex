@@ -22,9 +22,9 @@ defmodule Pets.Posts.Post do
   @doc false
   def changeset(post, attrs, usuario_scope) do
     post
-    |> cast(attrs, [:content, :fecha, :mascota_id, :usuario_id])
-    |> validate_required([:content, :fecha, :mascota_id, :usuario_id])
+    |> cast(attrs, [:content, :fecha, :mascota_id])
     |> put_change(:usuario_id, usuario_scope.usuario.id)
+    |> validate_required([:content, :mascota_id, :usuario_id])
     |> cast_embed(:imagenes_posts, with: &imagen_post_changeset/2)
   end
 

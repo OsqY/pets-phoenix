@@ -30,7 +30,7 @@ defmodule PetsWeb.DonacionInventarioLive.Index do
           {donacion_inventario.descripcion}
         </:col>
         <:col :let={{_id, donacion_inventario}} label="Fecha">{donacion_inventario.fecha}</:col>
-        <:col :let={{_id, donacion_inventario}} label="Donantes">{donacion_inventario.donantes}</:col>
+        <:col :let={{_id, donacion_inventario}} label="Donante">{donacion_inventario.donante}</:col>
         <:col :let={{_id, donacion_inventario}} label="Medida">{donacion_inventario.medida}</:col>
         <:col :let={{_id, donacion_inventario}} label="Tipo">{donacion_inventario.tipo}</:col>
         <:action :let={{_id, donacion_inventario}}>
@@ -44,9 +44,9 @@ defmodule PetsWeb.DonacionInventarioLive.Index do
         <:action :let={{id, donacion_inventario}}>
           <.link
             phx-click={JS.push("delete", value: %{id: donacion_inventario.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm="¿Estás seguro?"
           >
-            Delete
+            Eliminar
           </.link>
         </:action>
       </.table>

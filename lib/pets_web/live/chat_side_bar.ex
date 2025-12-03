@@ -14,19 +14,45 @@ defmodule PetsWeb.ChatSideBar do
      |> assign(:usuario_new_chat, nil)
      |> assign(:search_query, "")
      |> assign(:chats, [])
-     |> assign(:mensajes, [])
-     |> assign(:message_form, to_form(%{"mensaje_data" => ""}))}
+     |> assign(:mensajes, [])}
   end
 
   @impl true
-  def update(assigns, socket) do
-    chats = Chats.list_conversaciones(assigns.current_scope)
+  def update(%{new_mensaje: mensaje}, socket) do
+    # Manejar nuevo mensaje recibido via send_update
+    if socket.assigns.current_chat &&
+         socket.assigns.current_chat.id == mensaje.conversacion_id do
+      # Solo agregar si no existe ya
+      already_exists? = Enum.any?(socket.assigns.mensajes, &(&1.id == mensaje.id))
 
-    {:ok,
-     socket
-     |> assign(:current_scope, assigns.current_scope)
-     |> assign(:chats, chats)
-     |> assign_new(:form, fn -> to_form(%{"query" => ""}) end)}
+      if already_exists? do
+        {:ok, socket}
+      else
+        {:ok, assign(socket, :mensajes, socket.assigns.mensajes ++ [mensaje])}
+      end
+    else
+      # Recargar lista de chats para mostrar actividad
+      if socket.assigns[:current_scope] do
+        chats = Chats.list_conversaciones(socket.assigns.current_scope)
+        {:ok, assign(socket, :chats, chats)}
+      else
+        {:ok, socket}
+      end
+    end
+  end
+
+  def update(assigns, socket) do
+    socket = assign(socket, :current_scope, assigns.current_scope)
+
+    socket =
+      if assigns.current_scope do
+        chats = Chats.list_conversaciones(assigns.current_scope)
+        assign(socket, :chats, chats)
+      else
+        socket
+      end
+
+    {:ok, socket}
   end
 
   @impl true
@@ -317,8 +343,10 @@ defmodule PetsWeb.ChatSideBar do
     chat = Enum.find(socket.assigns.chats, &(&1.id == chat_id))
 
     if chat do
-      # Load messages
       mensajes = Chats.list_mensajes(chat)
+
+      # Notificar al padre que nos suscribimos a este chat
+      send(self(), {:subscribe_to_chat, chat.id})
 
       {:noreply,
        socket
@@ -366,12 +394,14 @@ defmodule PetsWeb.ChatSideBar do
            contenido: mensaje_data
          }) do
       {:ok, mensaje} ->
+        # Broadcast para que otros usuarios reciban el mensaje
         Phoenix.PubSub.broadcast(
           Pets.PubSub,
           "conversacion:#{chat.id}",
-          %{event: :new_mensaje, payload: mensaje}
+          {:new_mensaje, mensaje}
         )
 
+        # Agregar mensaje localmente
         {:noreply,
          socket
          |> assign(:mensajes, socket.assigns.mensajes ++ [mensaje])}
@@ -393,13 +423,17 @@ defmodule PetsWeb.ChatSideBar do
              conversacion_id: conversacion.id,
              contenido: mensaje_data
            }) do
+      # Notificar al padre para suscribirse
+      send(self(), {:subscribe_to_chat, conversacion.id})
+
+      # Broadcast del mensaje
       Phoenix.PubSub.broadcast(
         Pets.PubSub,
         "conversacion:#{conversacion.id}",
-        %{event: :new_mensaje, payload: mensaje}
+        {:new_mensaje, mensaje}
       )
 
-      # Reload chats to include new one
+      # Reload chats
       chats = Chats.list_conversaciones(socket.assigns.current_scope)
       new_chat = Enum.find(chats, &(&1.id == conversacion.id))
 

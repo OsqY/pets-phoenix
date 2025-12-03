@@ -153,9 +153,15 @@ defmodule Pets.Adopciones do
 
     estado_anterior = solicitud_adopcion.estado
 
+    changeset =
+      if solicitud_adopcion.refugio_id == scope.usuario.id do
+        SolicitudAdopcion.refugio_changeset(solicitud_adopcion, attrs)
+      else
+        SolicitudAdopcion.changeset(solicitud_adopcion, attrs, scope)
+      end
+
     with {:ok, solicitud_actualizada = %SolicitudAdopcion{}} <-
-           solicitud_adopcion
-           |> SolicitudAdopcion.changeset(attrs, scope)
+           changeset
            |> Repo.update() do
       broadcast_solicitud_adopcion(scope, {:updated, solicitud_actualizada})
 
@@ -275,7 +281,17 @@ defmodule Pets.Adopciones do
 
   """
   def get_seguimiento!(%Scope{} = scope, id) do
-    Repo.get_by!(Seguimiento, id: id, usuario_id: scope.usuario.id)
+    roles = scope.usuario.roles
+
+    if "refugio" in roles or "admin" in roles do
+      Repo.one!(
+        from s in Seguimiento,
+          where: s.id == ^id and (s.responsable_id == ^scope.usuario.id or s.usuario_id == ^scope.usuario.id),
+          limit: 1
+      )
+    else
+      Repo.get_by!(Seguimiento, id: id, usuario_id: scope.usuario.id)
+    end
   end
 
   @doc """
@@ -296,6 +312,13 @@ defmodule Pets.Adopciones do
            |> Seguimiento.changeset(attrs, scope)
            |> Repo.insert() do
       broadcast_seguimiento(scope, {:created, seguimiento})
+
+      seguimiento_con_solicitud = Repo.preload(seguimiento, solicitud: :mascota)
+      mascota_nombre = seguimiento_con_solicitud.solicitud.mascota.nombre
+      adoptante_id = seguimiento_con_solicitud.solicitud.adoptante_id
+
+      Chats.notificar_seguimiento(adoptante_id, mascota_nombre, seguimiento.solicitud_id)
+
       {:ok, seguimiento}
     end
   end

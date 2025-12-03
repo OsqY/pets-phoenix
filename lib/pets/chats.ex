@@ -468,6 +468,18 @@ defmodule Pets.Chats do
   end
 
   @doc """
+  Notifies an adopter about a new follow-up on their adoption request.
+  """
+  def notificar_seguimiento(adoptante_id, mascota_nombre, solicitud_id) do
+    create_notificacion(adoptante_id, %{
+      tipo: "seguimiento",
+      contenido: "Se ha registrado un nuevo seguimiento para tu solicitud de adopción de #{mascota_nombre}",
+      referencia_tipo: "solicitud_adopcion",
+      referencia_id: solicitud_id
+    })
+  end
+
+  @doc """
   Marks a notification as read.
   """
   def marcar_como_leida(%Scope{} = scope, notificacion_id) do

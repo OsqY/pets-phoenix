@@ -26,7 +26,6 @@ defmodule PetsWeb.HistorialMedicoLive.Form do
           </div>
 
           <.form for={@form} id="historial-form" phx-change="validate" phx-submit="save" class="space-y-8">
-            <%!-- Mascota y Fecha --%>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -70,7 +69,6 @@ defmodule PetsWeb.HistorialMedicoLive.Form do
               </div>
             </div>
 
-            <%!-- Tipo de Atención --%>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Tipo de Atención
@@ -103,7 +101,6 @@ defmodule PetsWeb.HistorialMedicoLive.Form do
               <% end %>
             </div>
 
-            <%!-- Descripción --%>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Descripción <span class="text-gray-400 font-normal">(opcional)</span>
@@ -116,7 +113,6 @@ defmodule PetsWeb.HistorialMedicoLive.Form do
               >{@form[:descripcion].value}</textarea>
             </div>
 
-            <%!-- Botones --%>
             <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
               <.button navigate={~p"/historial-medico"}>
                 Cancelar

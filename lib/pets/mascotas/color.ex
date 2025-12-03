@@ -19,4 +19,16 @@ defmodule Pets.Mascotas.Color do
     |> validate_required([:nombre, :especie_id])
     |> put_change(:usuario_id, usuario_scope.usuario.id)
   end
+
+  @doc """
+  Changeset para validar el borrado de un color.
+  Previene el borrado si tiene mascotas asociadas.
+  """
+  def delete_changeset(color) do
+    color
+    |> change()
+    |> no_assoc_constraint(:mascotas,
+      message: "No se puede eliminar este color porque tiene mascotas asociadas."
+    )
+  end
 end

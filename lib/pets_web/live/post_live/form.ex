@@ -1,7 +1,7 @@
 defmodule PetsWeb.PostLive.Form do
-  alias Pets.Mascotas
   use PetsWeb, :live_view
 
+  alias Pets.Mascotas
   alias Pets.Posts
   alias Pets.Posts.Post
   alias Pets.SimpleS3Upload
@@ -148,7 +148,7 @@ defmodule PetsWeb.PostLive.Form do
   defp put_photo_urls(socket, post_params) do
     uploaded_file_urls =
       consume_uploaded_entries(socket, :imagenes_posts, fn _meta, entry ->
-        {:ok, Pets.SimpleS3Upload.entry_url(entry)}
+        {:ok, SimpleS3Upload.entry_url(entry)}
       end)
 
     imagenes_existentes =

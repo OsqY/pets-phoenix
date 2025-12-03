@@ -8,10 +8,10 @@ defmodule PetsWeb.EspecieLive.Index do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Listing Especies
+        Lista de Especies
         <:actions>
           <.button variant="primary" navigate={~p"/admin/especies/crear"}>
-            <.icon name="hero-plus" /> New Especie
+            <.icon name="hero-plus" /> Nueva Especie
           </.button>
         </:actions>
       </.header>
@@ -24,16 +24,16 @@ defmodule PetsWeb.EspecieLive.Index do
         <:col :let={{_id, especie}} label="Nombre">{especie.nombre}</:col>
         <:action :let={{_id, especie}}>
           <div class="sr-only">
-            <.link navigate={~p"/admin/especies/#{especie}"}>Show</.link>
+            <.link navigate={~p"/admin/especies/#{especie}"}>Ver</.link>
           </div>
-          <.link navigate={~p"/admin/especies/#{especie}/editar"}>Edit</.link>
+          <.link navigate={~p"/admin/especies/#{especie}/editar"}>Editar</.link>
         </:action>
         <:action :let={{id, especie}}>
           <.link
             phx-click={JS.push("delete", value: %{id: especie.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm="¿Estás seguro?"
           >
-            Delete
+            Eliminar
           </.link>
         </:action>
       </.table>
@@ -49,7 +49,7 @@ defmodule PetsWeb.EspecieLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Mostrando especies")
+     |> assign(:page_title, "Lista de Especies")
      |> stream(:especies, list_especies(socket.assigns.current_scope))}
   end
 

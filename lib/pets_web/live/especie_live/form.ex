@@ -10,14 +10,14 @@ defmodule PetsWeb.EspecieLive.Form do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {@page_title}
-        <:subtitle>Use this form to manage especie records in your database.</:subtitle>
+        <:subtitle>Utiliza este formulario para gestionar las especies.</:subtitle>
       </.header>
 
       <.form for={@form} id="especie-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:nombre]} type="text" label="Nombre" />
         <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Especie</.button>
-          <.button navigate={return_path(@current_scope, @return_to, @especie)}>Cancel</.button>
+          <.button phx-disable-with="Guardando..." variant="primary">Guardar Especie</.button>
+          <.button navigate={return_path(@current_scope, @return_to, @especie)}>Cancelar</.button>
         </footer>
       </.form>
     </Layouts.app>
@@ -39,7 +39,7 @@ defmodule PetsWeb.EspecieLive.Form do
     especie = Mascotas.get_especie!(socket.assigns.current_scope, id)
 
     socket
-    |> assign(:page_title, "Edit Especie")
+    |> assign(:page_title, "Editar Especie")
     |> assign(:especie, especie)
     |> assign(:form, to_form(Mascotas.change_especie(socket.assigns.current_scope, especie)))
   end
@@ -48,7 +48,7 @@ defmodule PetsWeb.EspecieLive.Form do
     especie = %Especie{}
 
     socket
-    |> assign(:page_title, "New Especie")
+    |> assign(:page_title, "Nueva Especie")
     |> assign(:especie, especie)
     |> assign(:form, to_form(Mascotas.change_especie(socket.assigns.current_scope, especie)))
   end

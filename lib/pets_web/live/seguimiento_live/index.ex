@@ -14,18 +14,19 @@ defmodule PetsWeb.SeguimientoLive.Index do
       <.table
         id="seguimientos"
         rows={@streams.seguimientos}
-        row_click={fn {_id, seguimiento} -> JS.navigate(~p"/seguimientos/#{seguimiento}") end}
+        row_click={fn {_id, seguimiento} -> JS.navigate(~p"/seguimientos/#{seguimiento.id}") end}
       >
-        <:col :let={{_id, seguimiento}} label="Fecha">{seguimiento.fecha}</:col>
+        <:col :let={{_id, seguimiento}} label="Fecha">{Calendar.strftime(seguimiento.fecha, "%d/%m/%Y")}</:col>
         <:col :let={{_id, seguimiento}} label="Notas">{seguimiento.notas}</:col>
-        <:col :let={{_id, seguimiento}} label="Solicitud">{seguimiento.solicitud_id}</:col>
-        <:col :let={{_id, seguimiento}} label="Responsable">{seguimiento.responsable_id}</:col>
+        <:col :let={{_id, seguimiento}} label="Mascota">{seguimiento.solicitud.mascota.nombre}</:col>
+        <:col :let={{_id, seguimiento}} label="Adoptante">{seguimiento.solicitud.adoptante.email}</:col>
+        <:col :let={{_id, seguimiento}} label="Responsable">{seguimiento.responsable.email}</:col>
         <:action :let={{_id, seguimiento}}>
           <div class="sr-only">
-            <.link navigate={~p"/seguimientos/#{seguimiento}"}>Ver</.link>
+            <.link navigate={~p"/seguimientos/#{seguimiento.id}"}>Ver</.link>
           </div>
           <%= if "refugio" in @current_scope.usuario.roles do %>
-            <.link navigate={~p"/seguimientos/#{seguimiento}/edit"}>Editar</.link>
+            <.link navigate={~p"/seguimientos/#{seguimiento.id}/editar"}>Editar</.link>
           <% end %>
         </:action>
         <:action :let={{id, seguimiento}}>
@@ -71,10 +72,13 @@ defmodule PetsWeb.SeguimientoLive.Index do
   end
 
   defp list_seguimientos(current_scope) do
-    if "refugio" in current_scope.usuario.roles do
-      Adopciones.list_seguimientos(current_scope)
-    else
-      Adopciones.list_seguimientos_adoptante(current_scope)
-    end
+    seguimientos =
+      if "refugio" in current_scope.usuario.roles do
+        Adopciones.list_seguimientos(current_scope)
+      else
+        Adopciones.list_seguimientos_adoptante(current_scope)
+      end
+
+    Pets.Repo.preload(seguimientos, [:responsable, solicitud: [:mascota, :adoptante]])
   end
 end

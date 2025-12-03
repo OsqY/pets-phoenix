@@ -1,8 +1,8 @@
 defmodule PetsWeb.MascotaLive.Index do
-  alias Pets.Mascotas.Mascota
   use PetsWeb, :live_view
 
   alias Pets.Mascotas
+  alias Pets.Mascotas.Mascota
 
   @impl true
   def render(assigns) do
@@ -17,8 +17,7 @@ defmodule PetsWeb.MascotaLive.Index do
             </.button>
           </:actions>
         </.header>
-        
-    <!-- Barra de búsqueda -->
+
         <form phx-change="search" phx-debounce="300" class="mt-6">
           <div class="relative">
             <input
@@ -31,12 +30,10 @@ defmodule PetsWeb.MascotaLive.Index do
             />
           </div>
         </form>
-        
-    <!-- Grid de mascotas -->
+
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6">
           <div :for={{id, mascota} <- @streams.mascotas} id={id}>
             <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-              <!-- Imagen -->
               <div
                 class="relative aspect-square bg-gray-100 dark:bg-gray-800 cursor-pointer"
                 phx-click="navigate"
@@ -72,7 +69,6 @@ defmodule PetsWeb.MascotaLive.Index do
                     </div>
                   </div>
                 <% end %>
-                <!-- Badges simples -->
                 <div class="absolute top-2 left-2 flex flex-col gap-1">
                   <span class={[
                     "text-xs px-2 py-0.5 rounded font-medium",
@@ -82,7 +78,6 @@ defmodule PetsWeb.MascotaLive.Index do
                   </span>
                 </div>
               </div>
-              <!-- Info -->
               <div class="p-4">
                 <div class="flex items-start justify-between mb-2">
                   <h3
@@ -162,10 +157,9 @@ defmodule PetsWeb.MascotaLive.Index do
             </div>
           </div>
         </div>
-        
-    <!-- Estado vacío -->
+
         <div
-          :if={map_size(@streams.mascotas) == 0}
+          :if={@mascotas_count == 0}
           class="text-center py-16 mt-8"
         >
           <div class="text-gray-400 dark:text-gray-600 mb-4">
@@ -194,12 +188,11 @@ defmodule PetsWeb.MascotaLive.Index do
             Nueva Mascota
           </.button>
         </div>
-        
-    <!-- Contador -->
-        <div :if={map_size(@streams.mascotas) > 0} class="mt-6 text-center">
+
+        <div :if={@mascotas_count > 0} class="mt-6 text-center">
           <span class="text-sm text-gray-500 dark:text-gray-400">
-            {map_size(@streams.mascotas)}
-            {if map_size(@streams.mascotas) == 1, do: "mascota", else: "mascotas"}
+            {@mascotas_count}
+            {if @mascotas_count == 1, do: "mascota", else: "mascotas"}
           </span>
         </div>
       </div>
@@ -219,11 +212,14 @@ defmodule PetsWeb.MascotaLive.Index do
       Mascotas.subscribe_mascotas(socket.assigns.current_scope)
     end
 
+    mascotas = list_mascotas(socket.assigns.current_scope)
+
     {:ok,
      socket
      |> assign(:page_title, "Mascotas")
      |> assign(:query, "")
-     |> stream(:mascotas, list_mascotas(socket.assigns.current_scope))}
+     |> assign(:mascotas_count, length(mascotas))
+     |> stream(:mascotas, mascotas)}
   end
 
   @impl true
@@ -241,7 +237,10 @@ defmodule PetsWeb.MascotaLive.Index do
     mascota = Mascotas.get_mascota!(socket.assigns.current_scope, id)
     {:ok, _} = Mascotas.delete_mascota(socket.assigns.current_scope, mascota)
 
-    {:noreply, stream_delete(socket, :mascotas, mascota)}
+    {:noreply,
+     socket
+     |> assign(:mascotas_count, socket.assigns.mascotas_count - 1)
+     |> stream_delete(:mascotas, mascota)}
   end
 
   @impl true
@@ -251,6 +250,7 @@ defmodule PetsWeb.MascotaLive.Index do
     {:noreply,
      socket
      |> assign(:query, query)
+     |> assign(:mascotas_count, length(mascotas))
      |> stream(:mascotas, mascotas, reset: true)}
   end
 
@@ -262,8 +262,12 @@ defmodule PetsWeb.MascotaLive.Index do
   @impl true
   def handle_info({type, %Pets.Mascotas.Mascota{}}, socket)
       when type in [:created, :updated, :deleted] do
+    mascotas = list_mascotas(socket.assigns.current_scope)
+
     {:noreply,
-     stream(socket, :mascotas, list_mascotas(socket.assigns.current_scope), reset: true)}
+     socket
+     |> assign(:mascotas_count, length(mascotas))
+     |> stream(:mascotas, mascotas, reset: true)}
   end
 
   defp list_mascotas(current_scope, query \\ "") do

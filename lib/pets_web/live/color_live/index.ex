@@ -37,9 +37,9 @@ defmodule PetsWeb.ColorLive.Index do
         <:action :let={{id, color}}>
           <.link
             phx-click={JS.push("delete", value: %{id: color.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm="¿Estás seguro?"
           >
-            Delete
+            Eliminar
           </.link>
         </:action>
       </.table>
@@ -55,7 +55,7 @@ defmodule PetsWeb.ColorLive.Index do
 
     {:ok,
      socket
-     |> assign(:page_title, "Listing Colores")
+     |> assign(:page_title, "Lista de Colores")
      |> stream(:colores, list_colores(socket.assigns.current_scope))}
   end
 

@@ -2,7 +2,6 @@ defmodule PetsWeb.PostLive.Index do
   use PetsWeb, :live_view
 
   alias Pets.Posts
-  alias Pets.Repo
 
   @impl true
   def render(assigns) do
@@ -66,45 +65,15 @@ defmodule PetsWeb.PostLive.Index do
             </div>
 
             <%= if post_data.post.imagenes_posts && length(post_data.post.imagenes_posts) > 0 do %>
-              <div class="relative bg-gray-50 dark:bg-black aspect-square group" id={"post-carousel-#{post_data.post.id}"}>
-                <%= for {imagen, index} <- Enum.with_index(post_data.post.imagenes_posts) do %>
-                  <div class={[
-                    "absolute inset-0 transition-opacity duration-300",
-                    if(index == get_current_image(assigns, post_data.post.id), do: "opacity-100 z-10", else: "opacity-0 z-0")
-                  ]}>
-                    <img
-                      src={imagen.url || "/placeholder.svg"}
-                      alt="Post image"
-                      class="w-full h-full object-cover"
-                    />
-                  </div>
-                <% end %>
-
+              <div class="relative bg-gray-50 dark:bg-black aspect-square">
+                <img
+                  src={List.first(post_data.post.imagenes_posts).url || "/placeholder.svg"}
+                  alt="Post image"
+                  class="w-full h-full object-cover"
+                />
                 <%= if length(post_data.post.imagenes_posts) > 1 do %>
-                  <button
-                    type="button"
-                    phx-click="prev_image"
-                    phx-value-post-id={post_data.post.id}
-                    class="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/90 dark:bg-black/60 hover:bg-white text-gray-800 dark:text-white p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all"
-                  >
-                    <.icon name="hero-chevron-left" class="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    phx-click="next_image"
-                    phx-value-post-id={post_data.post.id}
-                    class="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-white/90 dark:bg-black/60 hover:bg-white text-gray-800 dark:text-white p-2 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all"
-                  >
-                    <.icon name="hero-chevron-right" class="w-4 h-4" />
-                  </button>
-                  <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20 px-2 py-1 rounded-full bg-black/20 backdrop-blur-sm">
-                    <%= for index <- 0..(length(post_data.post.imagenes_posts) - 1) do %>
-                      <div class={[
-                        "w-1.5 h-1.5 rounded-full transition-colors",
-                        if(index == get_current_image(assigns, post_data.post.id), do: "bg-white", else: "bg-white/40")
-                      ]}>
-                      </div>
-                    <% end %>
+                  <div class="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                    {length(post_data.post.imagenes_posts)}
                   </div>
                 <% end %>
               </div>
@@ -159,7 +128,7 @@ defmodule PetsWeb.PostLive.Index do
             </div>
 
             <%= if MapSet.member?(@expanded_comments, post_data.post.id) do %>
-              <div class="border-t border-gray-100 dark:border-gray-800 px-4 py-4 bg-gray-50/50 dark:bg-gray-800/30">
+              <div class="border-t border-gray-100 dark:border-gray-800 px-4 py-4 bg-gray-50/50 dark:bg-gray-800/30 animate-fade-in" id={"comments-section-#{post_data.post.id}"}>
                 <%= if @current_scope do %>
                   <.form
                     for={@comment_forms[post_data.post.id] || to_form(%{"contenido" => ""})}
@@ -267,16 +236,30 @@ defmodule PetsWeb.PostLive.Index do
     """
   end
 
+  @meses_es %{
+    1 => "enero",
+    2 => "febrero",
+    3 => "marzo",
+    4 => "abril",
+    5 => "mayo",
+    6 => "junio",
+    7 => "julio",
+    8 => "agosto",
+    9 => "septiembre",
+    10 => "octubre",
+    11 => "noviembre",
+    12 => "diciembre"
+  }
+
   defp format_date(date) do
-    Calendar.strftime(date, "%d de %B, %Y")
+    dia = date.day
+    mes = Map.get(@meses_es, date.month)
+    anio = date.year
+    "#{dia} de #{mes}, #{anio}"
   end
 
   defp format_datetime(datetime) do
     Calendar.strftime(datetime, "%d/%m/%Y %H:%M")
-  end
-
-  defp get_current_image(assigns, post_id) do
-    Map.get(assigns.carousel_indices, post_id, 0)
   end
 
   @impl true
@@ -291,13 +274,9 @@ defmodule PetsWeb.PostLive.Index do
 
     posts_with_stats = Posts.list_posts_with_stats(socket.assigns.current_scope)
 
-    carousel_indices =
-      Map.new(posts_with_stats, fn %{post: post} -> {post.id, 0} end)
-
     {:ok,
      socket
      |> assign(:page_title, "Publicaciones")
-     |> assign(:carousel_indices, carousel_indices)
      |> assign(:expanded_comments, MapSet.new())
      |> assign(:comments_by_post, %{})
      |> assign(:comment_forms, %{})
@@ -343,24 +322,27 @@ defmodule PetsWeb.PostLive.Index do
     post_id = String.to_integer(post_id)
     expanded = socket.assigns.expanded_comments
 
-    socket =
-      if MapSet.member?(expanded, post_id) do
-        socket
-        |> assign(:expanded_comments, MapSet.delete(expanded, post_id))
-      else
-        # Subscribe to comment updates for this post
-        if connected?(socket) do
-          Posts.subscribe_post_comentarios(post_id)
-        end
+    if MapSet.member?(expanded, post_id) do
+      post_data = Posts.get_post_with_stats!(post_id, socket.assigns.current_scope)
 
-        comments = Posts.list_comentarios_for_post(post_id)
-
-        socket
-        |> assign(:expanded_comments, MapSet.put(expanded, post_id))
-        |> assign(:comments_by_post, Map.put(socket.assigns.comments_by_post, post_id, comments))
+      {:noreply,
+       socket
+       |> assign(:expanded_comments, MapSet.delete(expanded, post_id))
+       |> stream_insert(:posts, post_data)}
+    else
+      if connected?(socket) do
+        Posts.subscribe_post_comentarios(post_id)
       end
 
-    {:noreply, socket}
+      comments = Posts.list_comentarios_for_post(post_id)
+      post_data = Posts.get_post_with_stats!(post_id, socket.assigns.current_scope)
+
+      {:noreply,
+       socket
+       |> assign(:expanded_comments, MapSet.put(expanded, post_id))
+       |> assign(:comments_by_post, Map.put(socket.assigns.comments_by_post, post_id, comments))
+       |> stream_insert(:posts, post_data)}
+    end
   end
 
   @impl true
@@ -415,58 +397,12 @@ defmodule PetsWeb.PostLive.Index do
   end
 
   @impl true
-  def handle_event("next_image", %{"post-id" => post_id}, socket) do
-    post_id = String.to_integer(post_id)
-    posts = Posts.list_posts()
-    post = Enum.find(posts, &(&1.id == post_id))
-
-    if post && post.imagenes_posts do
-      current = Map.get(socket.assigns.carousel_indices, post_id, 0)
-      total = length(post.imagenes_posts)
-      new_index = rem(current + 1, total)
-
-      {:noreply,
-       assign(
-         socket,
-         :carousel_indices,
-         Map.put(socket.assigns.carousel_indices, post_id, new_index)
-       )}
-    else
-      {:noreply, socket}
-    end
-  end
-
-  @impl true
-  def handle_event("prev_image", %{"post-id" => post_id}, socket) do
-    post_id = String.to_integer(post_id)
-    posts = Posts.list_posts()
-    post = Enum.find(posts, &(&1.id == post_id))
-
-    if post && post.imagenes_posts do
-      current = Map.get(socket.assigns.carousel_indices, post_id, 0)
-      total = length(post.imagenes_posts)
-      new_index = rem(current - 1 + total, total)
-
-      {:noreply,
-       assign(
-         socket,
-         :carousel_indices,
-         Map.put(socket.assigns.carousel_indices, post_id, new_index)
-       )}
-    else
-      {:noreply, socket}
-    end
-  end
-
-  @impl true
   def handle_info({type, %Pets.Posts.Post{}}, socket)
       when type in [:created, :updated, :deleted] do
     posts_with_stats = Posts.list_posts_with_stats(socket.assigns.current_scope)
-    carousel_indices = Map.new(posts_with_stats, fn %{post: post} -> {post.id, 0} end)
 
     {:noreply,
      socket
-     |> assign(:carousel_indices, carousel_indices)
      |> assign(:posts_empty?, posts_with_stats == [])
      |> stream(:posts, posts_with_stats, reset: true)}
   end

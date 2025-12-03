@@ -8,24 +8,23 @@ defmodule PetsWeb.DonacionInventarioLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Donacion inventario {@donacion_inventario.id}
-        <:subtitle>This is a donacion_inventario record from your database.</:subtitle>
+        Donación de Inventario {@donacion_inventario.id}
+        <:subtitle>Información del registro de donación de inventario.</:subtitle>
         <:actions>
-          <.button navigate={~p"/donaciones_inventario"}>
+          <.button navigate={~p"/refugio/donacion-inventario"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/donaciones_inventario/#{@donacion_inventario}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit donacion_inventario
+          <.button variant="primary" navigate={~p"/refugio/donacion-inventario/#{@donacion_inventario}/editar?return_to=show"}>
+            <.icon name="hero-pencil-square" /> Editar donación
           </.button>
         </:actions>
       </.header>
 
       <.list>
         <:item title="Cantidad">{@donacion_inventario.cantidad}</:item>
-        <:item title="Descripcion">{@donacion_inventario.descripcion}</:item>
+        <:item title="Descripción">{@donacion_inventario.descripcion}</:item>
         <:item title="Fecha">{@donacion_inventario.fecha}</:item>
-        <:item title="Donantes">{@donacion_inventario.donantes}</:item>
-        <:item title="Refugio">{@donacion_inventario.refugio_id}</:item>
+        <:item title="Donante">{@donacion_inventario.donante || "Anónimo"}</:item>
         <:item title="Medida">{@donacion_inventario.medida}</:item>
         <:item title="Tipo">{@donacion_inventario.tipo}</:item>
       </.list>
@@ -41,7 +40,7 @@ defmodule PetsWeb.DonacionInventarioLive.Show do
 
     {:ok,
      socket
-     |> assign(:page_title, "Show Donacion inventario")
+     |> assign(:page_title, "Ver Donación de Inventario")
      |> assign(:donacion_inventario, Refugios.get_donacion_inventario!(socket.assigns.current_scope, id))}
   end
 
@@ -60,7 +59,7 @@ defmodule PetsWeb.DonacionInventarioLive.Show do
     {:noreply,
      socket
      |> put_flash(:error, "La donación de inventario fue eliminada.")
-     |> push_navigate(to: ~p"/donaciones_inventario")}
+     |> push_navigate(to: ~p"/refugio/donacion-inventario")}
   end
 
   def handle_info({type, %Pets.Refugios.DonacionInventario{}}, socket)

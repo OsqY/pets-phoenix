@@ -20,4 +20,6 @@ defmodule Pets.Chats.Conversacion do
       message: "Ya existe una conversación entre estos usuarios."
     )
   end
+
+
 end

@@ -22,14 +22,12 @@ defmodule PetsWeb.Layouts do
   slot :inner_block, required: true
 
   def app(assigns) do
-    assigns = assign(assigns, :form, to_form(%{query: ""}))
+    assigns = assign(assigns, :form, to_form(%{"query" => ""}))
 
     ~H"""
     <div class="min-h-screen bg-gray-50 dark:bg-gray-950">
-      <!-- Header/Navbar -->
       <header class="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
         <div class="flex items-center justify-between h-16 px-4 mx-auto max-w-7xl">
-          <!-- Logo y Navegación Principal -->
           <div class="flex items-center gap-8">
             <a href="/" class="flex items-center gap-3">
               <img src={~p"/images/logo-negro-color.png"} class="h-8 w-auto dark:hidden" alt="Patitas en Casa" />
@@ -37,7 +35,6 @@ defmodule PetsWeb.Layouts do
               <span class="text-lg font-semibold text-gray-900 dark:text-gray-100">Patitas en Casa</span>
             </a>
 
-    <!-- Navegación Social (siempre visible) -->
             <nav class="hidden md:flex items-center gap-1">
               <a
                 href={~p"/mascotas"}
@@ -69,9 +66,7 @@ defmodule PetsWeb.Layouts do
               <% end %>
             </nav>
           </div>
-          <!-- Acciones del Header -->
           <div class="flex items-center gap-2">
-            <!-- Menú Admin/Refugio (si aplica) -->
             <%= if @current_scope && (has_user_admin?(@current_scope) || has_user_shelter?(@current_scope)) do %>
               <div class="relative" id="admin-menu">
                 <button
@@ -283,7 +278,6 @@ defmodule PetsWeb.Layouts do
           </div>
         </div>
       </header>
-      <!-- Main Content -->
       <main class="py-6">
         <div class="mx-auto max-w-7xl px-4">
           {render_slot(@inner_block)}

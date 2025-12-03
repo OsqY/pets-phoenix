@@ -25,22 +25,24 @@ defmodule PetsWeb.DonacionDineroLive.Index do
           end
         }
       >
-        <:col :let={{_id, donacion_dinero}} label="Monto">{donacion_dinero.monto}</:col>
-        <:col :let={{_id, donacion_dinero}} label="Descripcion">{donacion_dinero.descripcion}</:col>
+        <:col :let={{_id, donacion_dinero}} label="Monto">{format_lempiras(donacion_dinero.monto)}</:col>
+        <:col :let={{_id, donacion_dinero}} label="Descripción">{donacion_dinero.descripcion}</:col>
         <:col :let={{_id, donacion_dinero}} label="Fecha">{donacion_dinero.fecha}</:col>
-        <:col :let={{_id, donacion_dinero}} label="Donantes">{donacion_dinero.donantes}</:col>
+        <:col :let={{_id, donacion_dinero}} label="Donante">
+          {donacion_dinero.donante || "Anónimo"}
+        </:col>
         <:action :let={{_id, donacion_dinero}}>
           <div class="sr-only">
-            <.link navigate={~p"/refugio/donaciones-dinero/#{donacion_dinero}"}>Ver</.link>
+            <.link navigate={~p"/refugio/donacion-dinero/#{donacion_dinero}"}>Ver</.link>
           </div>
-          <.link navigate={~p"/refugio/donaciones-dinero/#{donacion_dinero}/edit"}>Editar</.link>
+          <.link navigate={~p"/refugio/donacion-dinero/#{donacion_dinero}/editar"}>Editar</.link>
         </:action>
         <:action :let={{id, donacion_dinero}}>
           <.link
             phx-click={JS.push("delete", value: %{id: donacion_dinero.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm="¿Estás seguro?"
           >
-            Delete
+            Eliminar
           </.link>
         </:action>
       </.table>

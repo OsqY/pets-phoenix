@@ -3,6 +3,7 @@ defmodule PetsWeb.SeguimientoLive.Form do
 
   alias Pets.Adopciones
   alias Pets.Adopciones.Seguimiento
+  alias Pets.Adopciones.SolicitudAdopcion
 
   @impl true
   def render(assigns) do
@@ -16,6 +17,12 @@ defmodule PetsWeb.SeguimientoLive.Form do
       <.form for={@form} id="seguimiento-form" phx-change="validate" phx-submit="save">
         <.input field={@form[:fecha]} type="hidden" />
         <.input field={@form[:notas]} type="textarea" label="Notas" />
+        <.input
+          field={@form[:nuevo_estado]}
+          type="select"
+          label="Estado de la solicitud"
+          options={@estados_options}
+        />
         <.input field={@form[:solicitud_id]} type="hidden" />
         <.input field={@form[:responsable_id]} type="hidden" />
         <.input field={@form[:usuario_id]} type="hidden" />
@@ -41,30 +48,38 @@ defmodule PetsWeb.SeguimientoLive.Form do
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     seguimiento = Adopciones.get_seguimiento!(socket.assigns.current_scope, id)
+    solicitud = Adopciones.get_solicitud_adopcion!(socket.assigns.current_scope, seguimiento.solicitud_id)
 
     socket
     |> assign(:page_title, "Editar Seguimiento")
     |> assign(:seguimiento, seguimiento)
+    |> assign(:estados_options, SolicitudAdopcion.solicitudes_estado_options())
+    |> assign(:solicitud, solicitud)
     |> assign(
       :form,
       to_form(Adopciones.change_seguimiento(socket.assigns.current_scope, seguimiento))
     )
   end
 
-  defp apply_action(socket, :new, _params) do
+  defp apply_action(socket, :new, params) do
+    solicitud_id = params["solicitud-id"]
+    solicitud = Adopciones.get_solicitud_adopcion!(socket.assigns.current_scope, solicitud_id)
+
     seguimiento = %Seguimiento{
-      solicitud_id: _params["solicitud-id"],
+      solicitud_id: solicitud_id,
       responsable_id: socket.assigns.current_scope.usuario.id,
-      usuario_id: _params["adoptante-id"],
-      fecha: NaiveDateTime.utc_now()
+      usuario_id: params["adoptante-id"],
+      fecha: Date.utc_today()
     }
 
     socket
     |> assign(:page_title, "Registrar Seguimiento")
     |> assign(:seguimiento, seguimiento)
+    |> assign(:estados_options, SolicitudAdopcion.solicitudes_estado_options())
+    |> assign(:solicitud, solicitud)
     |> assign(
       :form,
-      to_form(Adopciones.change_seguimiento(socket.assigns.current_scope, seguimiento))
+      to_form(Adopciones.change_seguimiento(socket.assigns.current_scope, seguimiento, %{nuevo_estado: solicitud.estado}))
     )
   end
 
@@ -85,12 +100,22 @@ defmodule PetsWeb.SeguimientoLive.Form do
   end
 
   defp save_seguimiento(socket, :edit, seguimiento_params) do
+    nuevo_estado = seguimiento_params["nuevo_estado"]
+
     case Adopciones.update_seguimiento(
            socket.assigns.current_scope,
            socket.assigns.seguimiento,
            seguimiento_params
          ) do
       {:ok, seguimiento} ->
+        if nuevo_estado && nuevo_estado != "" do
+          Adopciones.update_solicitud_adopcion(
+            socket.assigns.current_scope,
+            socket.assigns.solicitud,
+            %{estado: nuevo_estado, fecha_revision: Date.utc_today()}
+          )
+        end
+
         {:noreply,
          socket
          |> put_flash(:info, "Seguimiento actualizado con éxito.")
@@ -104,8 +129,18 @@ defmodule PetsWeb.SeguimientoLive.Form do
   end
 
   defp save_seguimiento(socket, :new, seguimiento_params) do
+    nuevo_estado = seguimiento_params["nuevo_estado"]
+
     case Adopciones.create_seguimiento(socket.assigns.current_scope, seguimiento_params) do
       {:ok, seguimiento} ->
+        if nuevo_estado && nuevo_estado != "" do
+          Adopciones.update_solicitud_adopcion(
+            socket.assigns.current_scope,
+            socket.assigns.solicitud,
+            %{estado: nuevo_estado, fecha_revision: Date.utc_today()}
+          )
+        end
+
         {:noreply,
          socket
          |> put_flash(:info, "Seguimiento creado con éxito.")
@@ -118,9 +153,8 @@ defmodule PetsWeb.SeguimientoLive.Form do
     end
   end
 
-  defp return_path(_scope, "index", _seguimiento) do
-    IO.inspect(_seguimiento, label: "Seguimiento")
-    ~p"/solicitudes-adopcion/#{_seguimiento.solicitud_id}/seguimientos"
+  defp return_path(_scope, "index", seguimiento) do
+    ~p"/solicitudes-adopcion/#{seguimiento.solicitud_id}/seguimientos"
   end
 
   defp return_path(_scope, "show", seguimiento),

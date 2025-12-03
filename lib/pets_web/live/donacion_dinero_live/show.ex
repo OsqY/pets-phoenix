@@ -8,24 +8,23 @@ defmodule PetsWeb.DonacionDineroLive.Show do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
-        Donacion dinero {@donacion_dinero.id}
-        <:subtitle>This is a donacion_dinero record from your database.</:subtitle>
+        Donación Monetaria {@donacion_dinero.id}
+        <:subtitle>Información del registro de donación monetaria.</:subtitle>
         <:actions>
-          <.button navigate={~p"/donaciones_dinero"}>
+          <.button navigate={~p"/refugio/donacion-dinero"}>
             <.icon name="hero-arrow-left" />
           </.button>
-          <.button variant="primary" navigate={~p"/donaciones_dinero/#{@donacion_dinero}/edit?return_to=show"}>
-            <.icon name="hero-pencil-square" /> Edit donacion_dinero
+          <.button variant="primary" navigate={~p"/refugio/donacion-dinero/#{@donacion_dinero}/editar?return_to=show"}>
+            <.icon name="hero-pencil-square" /> Editar donación
           </.button>
         </:actions>
       </.header>
 
       <.list>
-        <:item title="Monto">{@donacion_dinero.monto}</:item>
-        <:item title="Descripcion">{@donacion_dinero.descripcion}</:item>
+        <:item title="Monto">{format_lempiras(@donacion_dinero.monto)}</:item>
+        <:item title="Descripción">{@donacion_dinero.descripcion}</:item>
         <:item title="Fecha">{@donacion_dinero.fecha}</:item>
-        <:item title="Donantes">{@donacion_dinero.donantes}</:item>
-        <:item title="Refugio">{@donacion_dinero.refugio_id}</:item>
+        <:item title="Donante">{@donacion_dinero.donante || "Anónimo"}</:item>
       </.list>
     </Layouts.app>
     """
@@ -39,7 +38,7 @@ defmodule PetsWeb.DonacionDineroLive.Show do
 
     {:ok,
      socket
-     |> assign(:page_title, "Show Donacion dinero")
+     |> assign(:page_title, "Ver Donación Monetaria")
      |> assign(:donacion_dinero, Refugios.get_donacion_dinero!(socket.assigns.current_scope, id))}
   end
 
@@ -58,7 +57,7 @@ defmodule PetsWeb.DonacionDineroLive.Show do
     {:noreply,
      socket
      |> put_flash(:error, "La donación fue eliminada.")
-     |> push_navigate(to: ~p"/donaciones_dinero")}
+     |> push_navigate(to: ~p"/refugio/donacion-dinero")}
   end
 
   def handle_info({type, %Pets.Refugios.DonacionDinero{}}, socket)

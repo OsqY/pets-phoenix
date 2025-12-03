@@ -10,7 +10,7 @@ defmodule PetsWeb.ComentarioLive.Form do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <.header>
         {@page_title}
-        <:subtitle>Use this form to manage comentario records in your database.</:subtitle>
+        <:subtitle>Utiliza este formulario para gestionar los comentarios.</:subtitle>
       </.header>
 
       <.form for={@form} id="comentario-form" phx-change="validate" phx-submit="save">
@@ -18,8 +18,8 @@ defmodule PetsWeb.ComentarioLive.Form do
         <.input field={@form[:usuario_id]} type="number" label="Usuario" />
         <.input field={@form[:likes]} type="number" label="Likes" />
         <footer>
-          <.button phx-disable-with="Saving..." variant="primary">Save Comentario</.button>
-          <.button navigate={return_path(@current_scope, @return_to, @comentario)}>Cancel</.button>
+          <.button phx-disable-with="Guardando..." variant="primary">Guardar Comentario</.button>
+          <.button navigate={return_path(@current_scope, @return_to, @comentario)}>Cancelar</.button>
         </footer>
       </.form>
     </Layouts.app>
@@ -41,7 +41,7 @@ defmodule PetsWeb.ComentarioLive.Form do
     comentario = Posts.get_comentario!(socket.assigns.current_scope, id)
 
     socket
-    |> assign(:page_title, "Edit Comentario")
+    |> assign(:page_title, "Editar Comentario")
     |> assign(:comentario, comentario)
     |> assign(:form, to_form(Posts.change_comentario(socket.assigns.current_scope, comentario)))
   end
@@ -50,7 +50,7 @@ defmodule PetsWeb.ComentarioLive.Form do
     comentario = %Comentario{usuario_id: socket.assigns.current_scope.usuario.id}
 
     socket
-    |> assign(:page_title, "New Comentario")
+    |> assign(:page_title, "Nuevo Comentario")
     |> assign(:comentario, comentario)
     |> assign(:form, to_form(Posts.change_comentario(socket.assigns.current_scope, comentario)))
   end

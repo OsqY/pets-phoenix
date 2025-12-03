@@ -58,11 +58,9 @@ defmodule PetsWeb.Router do
 
     live_session :require_authenticated_usuario,
       on_mount: [
-        {
-          PetsWeb.UsuarioAuth,
-          :mount_current_scope
-        },
-        {PetsWeb.UsuarioAuth, :require_authenticated}
+        {PetsWeb.UsuarioAuth, :mount_current_scope},
+        {PetsWeb.UsuarioAuth, :require_authenticated},
+        {PetsWeb.ChatHooks, :default}
       ] do
       live "/usuario/configuracion", UsuarioLive.Settings, :edit
       live "/usuario/configuracion/confirmar-email/:token", UsuarioLive.Settings, :confirm_email
@@ -74,12 +72,15 @@ defmodule PetsWeb.Router do
       live "/mascotas/:id/editar", MascotaLive.Form, :edit
       live "/solicitudes-adopcion", SolicitudAdopcionLive.Index, :index
       live "/solicitudes-adopcion/crear", SolicitudAdopcionLive.Form, :new
+      live "/solicitudes-adopcion/:solicitud_id/seguimientos", SeguimientoLive.Index, :index
+      live "/solicitudes-adopcion/:solicitud_id/seguimientos/crear", SeguimientoLive.Form, :new
+      live "/solicitudes-adopcion/:solicitud_id/seguimientos/:id/editar", SeguimientoLive.Form, :edit
+      live "/solicitudes-adopcion/:solicitud_id/seguimientos/:id", SeguimientoLive.Show, :show
       live "/solicitudes-adopcion/:id/editar", SolicitudAdopcionLive.Form, :edit
       live "/solicitudes-adopcion/:id", SolicitudAdopcionLive.Show, :show
-      live "/solicitudes-adopcion/:id/seguimientos", SeguimientoLive.Index, :index
-      live "/solicitudes-adopcion/:id/seguimientos/crear", SeguimientoLive.Form, :new
-      live "/solicitudes-adopcion/:id/seguimientos/:id/editar", SeguimientoLive.Form, :edit
-      live "/solicitudes-adopcion/:id/seguimientos/:id", SeguimientoLive.Index, :show
+      live "/seguimientos", SeguimientoLive.Index, :index
+      live "/seguimientos/:id", SeguimientoLive.Show, :show
+      live "/seguimientos/:id/editar", SeguimientoLive.Form, :edit
       live "/chat", ChatLive, :index
       live "/notificaciones", NotificacionLive.Index, :index
     end
@@ -92,11 +93,9 @@ defmodule PetsWeb.Router do
 
     live_session :require_admin,
       on_mount: [
-        {
-          PetsWeb.UsuarioAuth,
-          :mount_current_scope
-        },
-        {PetsWeb.UsuarioAuth, :require_admin}
+        {PetsWeb.UsuarioAuth, :mount_current_scope},
+        {PetsWeb.UsuarioAuth, :require_admin},
+        {PetsWeb.ChatHooks, :default}
       ] do
       live "/admin/razas", RazaLive.Index, :index
       live "/admin/razas/crear", RazaLive.Form, :new
@@ -115,7 +114,8 @@ defmodule PetsWeb.Router do
     live_session :require_refugio,
       on_mount: [
         {PetsWeb.UsuarioAuth, :mount_current_scope},
-        {PetsWeb.UsuarioAuth, :require_refugio}
+        {PetsWeb.UsuarioAuth, :require_refugio},
+        {PetsWeb.ChatHooks, :default}
       ] do
       live "/refugio/inventario", ItemInventarioLive.Index, :index
       live "/refugio/inventario/crear-item", ItemInventarioLive.Form, :new
@@ -140,7 +140,10 @@ defmodule PetsWeb.Router do
     pipe_through [:browser]
 
     live_session :current_usuario,
-      on_mount: [{PetsWeb.UsuarioAuth, :mount_current_scope}] do
+      on_mount: [
+        {PetsWeb.UsuarioAuth, :mount_current_scope},
+        {PetsWeb.ChatHooks, :default}
+      ] do
       live "/usuario/registrarse", UsuarioLive.Registration, :new
       live "/usuario/iniciar-sesion", UsuarioLive.Login, :new
       live "/usuario/iniciar-sesion/:token", UsuarioLive.Confirmation, :new

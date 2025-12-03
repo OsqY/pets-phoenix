@@ -30,16 +30,16 @@ defmodule PetsWeb.ItemInventarioLive.Index do
         <:col :let={{_id, item_inventario}} label="Tipo">{item_inventario.tipo}</:col>
         <:action :let={{_id, item_inventario}}>
           <div class="sr-only">
-            <.link navigate={~p"/refugio/inventario/#{item_inventario}"}>Show</.link>
+            <.link navigate={~p"/refugio/inventario/#{item_inventario}"}>Ver</.link>
           </div>
-          <.link navigate={~p"/refugio/inventario/#{item_inventario}/editar"}>Edit</.link>
+          <.link navigate={~p"/refugio/inventario/#{item_inventario}/editar"}>Editar</.link>
         </:action>
         <:action :let={{id, item_inventario}}>
           <.link
             phx-click={JS.push("delete", value: %{id: item_inventario.id}) |> hide("##{id}")}
-            data-confirm="Are you sure?"
+            data-confirm="¿Estás seguro?"
           >
-            Delete
+            Eliminar
           </.link>
         </:action>
       </.table>

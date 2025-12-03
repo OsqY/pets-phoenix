@@ -2,7 +2,7 @@ defmodule Pets.Chats.Notificacion do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @tipos ~w(solicitud_adopcion cambio_estado_solicitud mensaje_chat comentario_post like_post general)
+  @tipos ~w(solicitud_adopcion cambio_estado_solicitud mensaje_chat comentario_post like_post seguimiento general)
 
   schema "notificaciones" do
     field :contenido, :string

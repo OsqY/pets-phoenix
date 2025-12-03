@@ -14,16 +14,10 @@ defmodule PetsWeb.DonacionDineroLive.Form do
       </.header>
 
       <.form for={@form} id="donacion_dinero-form" phx-change="validate" phx-submit="save">
-        <.input field={@form[:monto]} type="number" label="Monto" step="any" />
+        <.input field={@form[:monto]} type="text" inputmode="decimal" label="Monto" placeholder="0.00" />
         <.input field={@form[:descripcion]} type="text" label="Descripcion" />
         <.input field={@form[:fecha]} type="date" label="Fecha" />
-        <.input
-          field={@form[:donantes]}
-          type="select"
-          multiple
-          label="Donantes"
-          options={[{"Option 1", "option1"}, {"Option 2", "option2"}]}
-        />
+        <.input field={@form[:donante]} type="text" label="Donante" placeholder="Nombre del donante (opcional)" />
         <footer>
           <.button phx-disable-with="Guardando..." variant="primary">Guardar</.button>
           <.button navigate={return_path(@current_scope, @return_to, @donacion_dinero)}>

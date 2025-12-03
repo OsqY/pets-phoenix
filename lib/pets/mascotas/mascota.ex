@@ -102,4 +102,16 @@ defmodule Pets.Mascotas.Mascota do
   def imagen_changeset(imagen, params) do
     imagen |> cast(params, [:url, :imagen])
   end
+
+  @doc """
+  Changeset para validar el borrado de una mascota.
+  Previene el borrado si tiene posts asociados.
+  """
+  def delete_changeset(mascota) do
+    mascota
+    |> change()
+    |> no_assoc_constraint(:posts,
+      message: "No se puede eliminar esta mascota porque tiene publicaciones asociadas."
+    )
+  end
 end

@@ -41,6 +41,12 @@ defmodule Pets.Adopciones.SolicitudAdopcion do
     |> put_change(:adoptante_id, usuario_scope.usuario.id)
   end
 
+  def refugio_changeset(solicitud_adopcion, attrs) do
+    solicitud_adopcion
+    |> cast(attrs, [:estado, :fecha_revision])
+    |> validate_required([:estado])
+  end
+
   def solicitudes_estado_options, do: @solicitudes_estado_options
 
   def humanize_estado(atom) do

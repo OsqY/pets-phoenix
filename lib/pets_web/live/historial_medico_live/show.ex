@@ -119,8 +119,26 @@ defmodule PetsWeb.HistorialMedicoLive.Show do
     end
   end
 
+  @meses_es %{
+    1 => "enero",
+    2 => "febrero",
+    3 => "marzo",
+    4 => "abril",
+    5 => "mayo",
+    6 => "junio",
+    7 => "julio",
+    8 => "agosto",
+    9 => "septiembre",
+    10 => "octubre",
+    11 => "noviembre",
+    12 => "diciembre"
+  }
+
   defp format_date(date) do
-    Calendar.strftime(date, "%d de %B, %Y")
+    dia = date.day
+    mes = @meses_es[date.month]
+    año = date.year
+    "#{dia} de #{mes}, #{año}"
   end
 
   defp format_datetime(datetime) do

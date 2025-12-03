@@ -17,11 +17,21 @@ defmodule PetsWeb.MascotaLive.Form do
 
       <.form for={@form} id="mascota-form" phx-change="validate" phx-submit="save" multipart>
         <.input field={@form[:nombre]} type="text" label="Nombre" />
-        <.input field={@form[:descripcion]} type="textarea" label="Descripcion" />
-        <.input field={@form[:edad]} type="number" label="Edad" />
-        <.input field={@form[:sexo]} type="text" label="Sexo" />
-        <.input field={@form[:tamanio]} type="text" label="Tamanio" />
-        <.input field={@form[:peso]} type="number" label="Peso" step="any" />
+        <.input field={@form[:descripcion]} type="textarea" label="Descripción" />
+        <.input field={@form[:edad]} type="number" label="Edad (años)" />
+        <.input
+          field={@form[:sexo]}
+          type="select"
+          label="Sexo"
+          options={[{"Macho", "Macho"}, {"Hembra", "Hembra"}]}
+        />
+        <.input
+          field={@form[:tamanio]}
+          type="select"
+          label="Tamaño"
+          options={[{"Pequeño", "Pequeño"}, {"Mediano", "Mediano"}, {"Grande", "Grande"}]}
+        />
+        <.input field={@form[:peso]} type="number" label="Peso (kg)" step="any" />
         <.input field={@form[:color_id]} type="select" options={@colores} label="Color" />
         <.input
           field={@form[:energia]}

@@ -46,7 +46,6 @@ defmodule PetsWeb.Components.Notificaciones do
         class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden z-50"
         phx-click-away={hide_dropdown()}
       >
-        <%!-- Header --%>
         <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
           <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
             Notificaciones
@@ -62,7 +61,6 @@ defmodule PetsWeb.Components.Notificaciones do
           <% end %>
         </div>
 
-        <%!-- Lista de notificaciones --%>
         <div class="max-h-96 overflow-y-auto">
           <%= if @notificaciones == [] do %>
             <div class="flex flex-col items-center justify-center py-8 px-4 text-center">
@@ -112,7 +110,6 @@ defmodule PetsWeb.Components.Notificaciones do
           <% end %>
         </div>
 
-        <%!-- Footer --%>
         <%= if @notificaciones != [] do %>
           <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
             <.link
